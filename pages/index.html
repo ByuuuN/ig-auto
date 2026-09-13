@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OAuth callback</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem; line-height: 1.7;
+  }
+  h1 { font-size: 1.125rem; margin-bottom: 1.5rem; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875rem;
+  }
+  pre {
+    background: rgba(128,128,128,0.12); padding: 1rem; border-radius: 6px;
+    word-break: break-all; white-space: pre-wrap;
+  }
+  button { padding: 0.5rem 1rem; font-size: 0.9rem; cursor: pointer; }
+  .note { color: #888; font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<h1>Instagram OAuth callback</h1>
+<div id="out"></div>
+<script>
+  var params = new URLSearchParams(location.search);
+  var code = params.get('code');
+  var error = params.get('error_description') || params.get('error');
+  var out = document.getElementById('out');
+
+  if (code) {
+    // Meta は末尾に #_ を付けて返すことがある
+    code = code.replace(/#_$/, '');
+    out.innerHTML =
+      '<p>認可コードを取得しました。コピーして exchange.js に渡してください。</p>' +
+      '<pre id="code"></pre>' +
+      '<button id="copy">コピー</button>' +
+      '<p class="note">このコードは数分で失効します。</p>';
+    document.getElementById('code').textContent = code;
+    document.getElementById('copy').onclick = function () {
+      navigator.clipboard.writeText(code);
+      document.getElementById('copy').textContent = 'コピーしました';
+    };
+  } else if (error) {
+    out.innerHTML = '<p>認可に失敗しました。</p><pre></pre>';
+    out.querySelector('pre').textContent = error;
+  } else {
+    out.innerHTML = '<p class="note">認可 URL からリダイレクトされると、ここにコードが表示されます。</p>';
+  }
+</script>
+</body>
+</html>

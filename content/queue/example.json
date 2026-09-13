@@ -1,0 +1,13 @@
+{
+  "id": "0001",
+  "type": "carousel",
+  "status": "draft",
+  "scheduled_for": null,
+  "images": [
+    "0001-01.jpg",
+    "0001-02.jpg"
+  ],
+  "caption": "ここに本文。\n\n体験ベースの内容を必ず1つ入れること。",
+  "hashtags": [],
+  "source_note": "元ネタ: どのプロジェクトの何の作業か"
+}

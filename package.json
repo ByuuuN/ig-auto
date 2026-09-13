@@ -1,0 +1,15 @@
+{
+  "name": "ig-auto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Instagram auto-posting pipeline (Instagram Login / graph.instagram.com)",
+  "scripts": {
+    "whoami": "node scripts/whoami.js",
+    "auth:refresh": "node src/auth/refresh.js",
+    "post": "node scripts/post-next.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

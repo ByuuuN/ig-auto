@@ -1,0 +1,37 @@
+# 予約投稿用のワークフロー。
+# 認証と投稿処理が完成するまでは push トリガーを有効にしないこと。
+name: post
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 3 * * *'   # UTC 03:00 = JST 12:00
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install
+
+      - name: Publish next item in queue
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_API_VERSION: ${{ vars.IG_API_VERSION }}
+          ASSET_BASE_URL: ${{ vars.ASSET_BASE_URL }}
+          DRY_RUN: 'true'   # 動作確認が済むまで true のまま
+        run: npm run post
+
+      - name: Commit queue state
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add content/
+          git diff --staged --quiet || git commit -m 'chore: update queue state'
+          git push
