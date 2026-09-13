@@ -1,0 +1,21 @@
+# 認証情報 — 絶対にコミットしない
+.env
+.env.local
+.env.*.local
+*.token
+token.json
+config.json
+secrets/
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 作業用
+tmp/
+*.log
