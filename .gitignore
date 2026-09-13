@@ -1,5 +1,6 @@
 # 認証情報 — 絶対にコミットしない
 .env
+.env.tmp
 .env.local
 .env.*.local
 *.token

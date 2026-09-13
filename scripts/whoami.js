@@ -13,6 +13,13 @@ try {
   console.log(`  media_count  : ${me.media_count}`);
   console.log(`  user_id      : ${me.user_id}`);
 
+  const exp = process.env.IG_TOKEN_EXPIRES_AT;
+  if (exp) {
+    const days = Math.floor((new Date(exp) - Date.now()) / 86400000);
+    console.log(`  token 期限   : ${new Date(exp).toLocaleDateString('ja-JP')}（残り ${days} 日）`);
+    if (days <= 14) console.warn(`\n注意: トークンの期限が近いです。npm run auth:refresh を実行してください。`);
+  }
+
   if (me.account_type !== 'BUSINESS') {
     console.warn(`\n注意: account_type が ${me.account_type} です。ストーリーズの API 投稿はビジネス限定。`);
   }
