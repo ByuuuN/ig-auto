@@ -14,6 +14,11 @@
 - ホストは `graph.instagram.com`（`graph.facebook.com` ではない）
 - Facebook ページの連携は **不要**
 - 認証は Business Login for Instagram
+- **トークンは App Dashboard の「アカウントを追加」→「トークンを生成」で発行する。**
+  自分のアカウント 1 つだけを扱うため、OAuth の認可フロー（コード交換）は実装しない。
+  他人のアカウントを扱う段階になったら改めて実装する
+- `IG_USER_ID` は `npm run whoami` が返す `user_id`（17841… で始まる）を使う。
+  ダッシュボードに表示される ID は別物
 - 対象は Instagram プロアカウント（ビジネス）のみ
 - スコープは `instagram_` 接頭辞つきのものだけを使う:
   - `instagram_business_basic`
@@ -44,11 +49,11 @@
 
 | 用途 | 使うもの |
 | --- | --- |
-| OAuth コールバック | GitHub Pages（静的ページ） |
 | 定期実行 | GitHub Actions（cron） |
 | 画像ホスティング | 本リポジトリの公開 raw URL |
 | トークン保管 | Actions Secrets / ローカルは .env |
 
+- `pages/` の OAuth コールバックは現在未使用（将来 OAuth を実装する場合のために残している）
 - Vercel の Hobby プランは商用利用不可のため使わない
 - データベースは現段階では導入しない
 
@@ -70,8 +75,8 @@
 
 ## 実装の順序
 
-1. `src/client.js` — API ラッパ
-2. `src/auth/exchange.js` — 認可コード → 短期 → 長期トークン
-3. `scripts/whoami.js` — 疎通確認
-4. （ここまで通ってから）投稿系
+1. ~~`src/client.js` — API ラッパ~~ 完了
+2. ~~`scripts/whoami.js` — 疎通確認~~ 完了（2026-09-13 疎通 OK）
+3. `src/auth/refresh.js` — 長期トークンの更新（60 日失効の前に）
+4. 投稿系
 5. インサイト取得

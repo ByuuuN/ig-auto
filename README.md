@@ -6,26 +6,20 @@ Instagram ビジネスアカウントへの投稿・分析を自動化するパ�
 ## 状態
 
 - [x] ディレクトリ雛形
-- [ ] Meta アプリ作成（docs/setup.md）
-- [ ] トークン取得
-- [ ] 疎通確認
+- [x] Meta アプリ作成（docs/setup.md）
+- [x] トークン取得（ダッシュボードで発行）
+- [x] 疎通確認（`npm run whoami`）
+- [ ] トークンの自動更新
 - [ ] 投稿の自動化
 - [ ] インサイト取得
 
 ## はじめかた
 
-```bash
-cp .env.example .env
-git init
-git add .gitignore
-git commit -m "chore: add gitignore first"
-git add .
-git commit -m "chore: scaffold"
-```
+1. `docs/setup.md` のチェックリストを上から進める
+2. `cp .env.example .env` してトークン等を記入
+3. `npm run whoami` で疎通確認
 
-`.gitignore` を先にコミットすること。順番を逆にすると認証情報が履歴に残る。
-
-その後 `docs/setup.md` のチェックリストを上から進める。
+依存パッケージは無い（Node 20+ 標準機能のみ）。
 
 ## 注意
 
