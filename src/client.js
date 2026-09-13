@@ -31,14 +31,16 @@ export function mask(text) {
 async function request(method, path, params = {}) {
   const { token, version } = config();
   const url = new URL(`${HOST}/${version}/${path.replace(/^\//, '')}`);
-  const body = new URLSearchParams({ ...params, access_token: token });
+  const body = new URLSearchParams(params);
+  // トークンは URL に載せずヘッダで送る（ログや例外メッセージに残らないように）
+  const headers = { Authorization: `Bearer ${token}` };
 
   let res;
   if (method === 'GET') {
     url.search = body.toString();
-    res = await fetch(url);
+    res = await fetch(url, { headers });
   } else {
-    res = await fetch(url, { method, body });
+    res = await fetch(url, { method, body, headers });
   }
 
   const data = await res.json().catch(() => ({}));
