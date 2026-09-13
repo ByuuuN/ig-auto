@@ -13,7 +13,7 @@
 - [x] 6. 「アカウントを追加」からアクセストークンを発行
 - [x] 7. Instagram App ID / トークンを .env に記入
 - [x] 8. whoami.js で疎通確認
-- [ ] 9. GitHub リポジトリを public で作成（画像の raw 配信用）
+- [x] 9. GitHub リポジトリを public で作成（画像の raw 配信用）
 
 ---
 
@@ -142,6 +142,8 @@ pages/index.html がそれを画面に表示するので、コピーする。
 
 - アプリの役割は、ユースケース画面では左メニューがアイコンのみに縮んでいて見つけにくい。
   `https://developers.facebook.com/apps/<Meta アプリ ID>/roles/roles/` を直接開くのが確実
+- GitHub の新規作成画面で「何かがおかしくなりました！」と出ても、作成自体は成功していることがある。
+  再度作成する前に `https://github.com/<user>/ig-auto` を開いて確認する
 - テスター招待の承認は PC ブラウザの instagram.com → 設定 → アプリとウェブサイト で行う
 - **ダッシュボードに表示される ID は `IG_USER_ID` に使えない。**
   `npm run whoami` が返す `user_id`（17841… で始まる 17 桁）を使う
