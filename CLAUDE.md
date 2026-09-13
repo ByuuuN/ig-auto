@@ -77,6 +77,6 @@
 
 1. ~~`src/client.js` — API ラッパ~~ 完了
 2. ~~`scripts/whoami.js` — 疎通確認~~ 完了（2026-09-13 疎通 OK）
-3. `src/auth/refresh.js` — 長期トークンの更新（60 日失効の前に）
-4. 投稿系
+3. ~~`src/auth/refresh.js` — 長期トークンの更新~~ 完了（`npm run auth:refresh`）
+4. 投稿系 — `scripts/post-next.js` 実装済み。DRY_RUN でのテストのみ済、実投稿は未実施
 5. インサイト取得

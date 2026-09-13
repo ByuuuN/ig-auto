@@ -33,18 +33,17 @@ try {
   if (!existsSync(ENV_PATH)) {
     // Actions など .env が無い環境。値は出力しない
     console.log(`更新OK（有効期限 ${days} 日）。.env が無いため保存していません。`);
-    process.exit(0);
+  } else {
+    let env = readFileSync(ENV_PATH, 'utf8');
+    env = setEnv(env, 'IG_ACCESS_TOKEN', data.access_token);
+    env = setEnv(env, 'IG_TOKEN_EXPIRES_AT', expiresAt.toISOString());
+    writeFileSync(`${ENV_PATH}.tmp`, env);
+    renameSync(`${ENV_PATH}.tmp`, ENV_PATH);
+
+    console.log('トークンを更新しました');
+    console.log(`  有効期限: ${expiresAt.toLocaleString('ja-JP')}（${days} 日後）`);
   }
-
-  let env = readFileSync(ENV_PATH, 'utf8');
-  env = setEnv(env, 'IG_ACCESS_TOKEN', data.access_token);
-  env = setEnv(env, 'IG_TOKEN_EXPIRES_AT', expiresAt.toISOString());
-  writeFileSync(`${ENV_PATH}.tmp`, env);
-  renameSync(`${ENV_PATH}.tmp`, ENV_PATH);
-
-  console.log('トークンを更新しました');
-  console.log(`  有効期限: ${expiresAt.toLocaleString('ja-JP')}（${days} 日後）`);
 } catch (err) {
   console.error('更新失敗:', mask(err.message));
-  process.exit(1);
+  process.exitCode = 1;
 }

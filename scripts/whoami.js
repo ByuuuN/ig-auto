@@ -28,5 +28,5 @@ try {
   }
 } catch (err) {
   console.error('疎通失敗:', mask(err.message));
-  process.exit(1);
+  process.exitCode = 1;
 }

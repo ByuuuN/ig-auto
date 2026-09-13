@@ -7,6 +7,9 @@ on:
   # schedule:
   #   - cron: '0 3 * * *'   # UTC 03:00 = JST 12:00
 
+permissions:
+  contents: write   # 投稿済みのキューを commit するため
+
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -17,8 +20,6 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm install
-
       - name: Publish next item in queue
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
@@ -26,7 +27,8 @@ jobs:
           IG_API_VERSION: ${{ vars.IG_API_VERSION }}
           ASSET_BASE_URL: ${{ vars.ASSET_BASE_URL }}
           DRY_RUN: 'true'   # 動作確認が済むまで true のまま
-        run: npm run post
+        # 対話できないので --yes が必要。実際に投稿されるかは DRY_RUN で決まる
+        run: npm run post -- --yes
 
       - name: Commit queue state
         run: |
