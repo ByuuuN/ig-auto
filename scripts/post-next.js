@@ -2,6 +2,7 @@
 //
 //   npm run post            DRY_RUN=true なら内容の表示とチェックだけ
 //   npm run post -- --yes   確認プロンプトを省略（Actions など対話できない環境用）
+//   --ignore-schedule       予定時刻前でも対象にする（DRY_RUN のときだけ有効。事前チェック用）
 //
 // 実際に投稿するには .env（または Actions の env）で DRY_RUN=false にする。
 import { createInterface } from 'node:readline/promises';
@@ -21,6 +22,7 @@ import {
   createCarouselContainer,
   waitUntilReady,
   publishContainer,
+  findPublishedWithCaption,
 } from '../src/publish/instagram.js';
 
 async function confirm(question) {
@@ -51,7 +53,8 @@ async function checkLimit() {
 async function main() {
   try {
     const { dryRun } = config();
-    const next = pickNext(loadQueue());
+    const ignoreSchedule = dryRun && process.argv.includes('--ignore-schedule');
+    const next = pickNext(loadQueue(), ignoreSchedule ? new Date(8.64e15) : new Date());
     if (!next) {
       console.log('投稿対象がありません（status が ready で、予定時刻を過ぎたものが無い）');
       return 0;
@@ -79,6 +82,14 @@ async function main() {
     }
 
     await checkLimit();
+
+    // 前回の実行で公開済みなのに、キューの更新（commit）だけ失敗していた場合に備える
+    const existingId = await findPublishedWithCaption(caption);
+    if (existingId) {
+      console.log(`\n同じ本文の投稿がすでにあります（media_id ${existingId}）。投稿しません。`);
+      if (!dryRun) console.log(`キューを投稿済みにしました → ${markPublished(next, existingId)}`);
+      return 0;
+    }
 
     if (dryRun) {
       console.log('\nDRY_RUN=true のため投稿していません。チェックはすべて通りました。');

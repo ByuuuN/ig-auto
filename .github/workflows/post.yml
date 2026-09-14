@@ -1,14 +1,31 @@
 # 予約投稿用のワークフロー。
-# 認証と投稿処理が完成するまでは push トリガーを有効にしないこと。
+#
+# - 手動実行（Actions タブの Run workflow）は既定で DRY_RUN。投稿はしない
+# - 予約実行（schedule）は実際に投稿する。キューの status が ready で、
+#   scheduled_for を過ぎたものが 1 件だけ対象になる
+# - 止めたいとき: Actions タブ → post → 右上の「…」→ Disable workflow
 name: post
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 3 * * *'   # UTC 03:00 = JST 12:00
+    inputs:
+      dry_run:
+        description: 'true なら投稿せずにチェックだけ行う'
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+  schedule:
+    # Actions の予約は混雑で遅れたり飛ばされたりするため 2 回仕込む。
+    # 2 回目は、1 回目で投稿済みなら何もしない（同じ本文の投稿を API で確認する）
+    - cron: '53 11 15 9 *'   # 9/15 20:53 JST — 001-autoscribe
+    - cron: '23 12 15 9 *'   # 9/15 21:23 JST — 予備
 
 permissions:
   contents: write   # 投稿済みのキューを commit するため
+
+concurrency:
+  group: post
+  cancel-in-progress: false
 
 jobs:
   post:
@@ -18,22 +35,24 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Publish next item in queue
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          IG_API_VERSION: ${{ vars.IG_API_VERSION }}
-          ASSET_BASE_URL: ${{ vars.ASSET_BASE_URL }}
-          DRY_RUN: 'true'   # 動作確認が済むまで true のまま
-        # 対話できないので --yes が必要。実際に投稿されるかは DRY_RUN で決まる
-        run: npm run post -- --yes
+          IG_API_VERSION: v23.0
+          ASSET_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/content/assets
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run || 'true' }}
+        # 対話できないので --yes が必要。内容は push 前に人が確認済みであること
+        run: npm run post -- --yes ${{ github.event_name == 'workflow_dispatch' && '--ignore-schedule' || '' }}
 
       - name: Commit queue state
+        if: always()
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add content/
           git diff --staged --quiet || git commit -m 'chore: update queue state'
+          git pull --rebase
           git push

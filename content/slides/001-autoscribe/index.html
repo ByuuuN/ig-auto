@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>001 AutoScribe</title>
+<link rel="stylesheet" href="../_shared/base.css">
+</head>
+<body>
+
+<!-- 1. 表紙 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h1>動画を<span class="mark">「放り込むだけ」</span>で<br><span class="em">文字起こし＋AI要約</span></h1>
+  <p class="lead" style="margin-top:36px">本業インフラエンジニアが<br>自分のために作ったツール</p>
+  <div class="cover-visual">
+    <div class="file"><div class="big">▶</div><div class="name">会議.mp4</div></div>
+    <div class="arrow">→</div>
+    <div class="outs">
+      <div><span>■</span>本文</div>
+      <div><span>■</span>時刻付き</div>
+      <div><span>■</span>字幕 (SRT)</div>
+      <div><span>■</span>AI要約</div>
+    </div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+  <div class="swipe">スワイプ →</div>
+</section>
+
+<!-- 2. 悩み -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>こんなこと<br>ありませんか？</h2>
+  <div class="list">
+    <div class="card"><span class="ico">!</span><div>会議の録画、見返すのが面倒</div></div>
+    <div class="card"><span class="ico">!</span><div>講座動画を何度も止めてメモ</div></div>
+    <div class="card"><span class="ico">!</span><div>字幕をつけたいけど<br>手作業はつらい</div></div>
+  </div>
+  <p class="lead" style="margin-top:auto"><b style="color:var(--ink)">全部「フォルダに入れるだけ」</b>で<br>終わるようにしました。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 3. しくみ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>しくみ</h2>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><div>フォルダに入れる<small>音声でも動画でもOK</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">2</span><div>自動で検知<small>コピーが終わるまで待ってから開始</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">3</span><div>PCの中で文字起こし<small>音声認識AI「Whisper」</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">4</span><div>要約・整形<small>Claude（AI）がまとめる</small></div></div>
+  </div>
+  <div class="outrow">
+    <span class="chip">.txt</span><span class="chip">.timestamp.txt</span><span class="chip">.srt</span><span class="chip">.vtt</span><span class="chip">.summary.md</span>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 4. 速さ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>89秒の音声が<br>何秒で終わる？</h2>
+  <div class="bench">
+    <div>
+      <div class="bar-label"><span>GPU</span><b class="em">3.4秒</b></div>
+      <div class="bar"><i style="width:8%;background:var(--accent)"></i></div>
+    </div>
+    <div>
+      <div class="bar-label"><span>CPU</span><b>42.7秒</b></div>
+      <div class="bar"><i style="width:100%;background:var(--sub)"></i></div>
+    </div>
+  </div>
+  <p class="ratio">GPUなら<span class="em">約12倍速</span></p>
+  <p class="note">RTX 2080 Ti ／ モデル large-v3-turbo で実測。<br>GPUが無いPCでも、自動でCPUに切り替わって動きます。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 5. 音声は外に出さない -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>音声は<br><span class="mark">PCの外に出さない</span></h2>
+  <div class="list">
+    <div class="card"><span class="ico">✓</span><div>文字起こしはPCの中だけで完結<small>音声・動画ファイルは外部に送信しない</small></div></div>
+    <div class="card"><span class="ico">✓</span><div>送るのは要約するときの「文字」だけ<small>音声そのものは送らない</small></div></div>
+    <div class="card"><span class="ico">✓</span><div>要約をオフにすれば通信ゼロ<small>機密性の高い音声はこちらで</small></div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 6. こだわり -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>地味に<br>こだわったところ</h2>
+  <div class="list">
+    <div class="card"><span class="ico">1</span><div>AIの「空耳」を自動で消す<small>無音部分に出る「ご視聴ありがとうございました」<br>などの決まり文句や、同じ文の繰り返しを除去</small></div></div>
+    <div class="card"><span class="ico">2</span><div>同じ名前の動画でも上書きしない<small>講座の「1,イントロダクション」が<br>各回にあっても大丈夫</small></div></div>
+    <div class="card"><span class="ico">3</span><div>直して保存すると字幕も作り直し<small>もう一度文字起こしし直す必要なし</small></div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 7. 使った技術 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>使った技術</h2>
+  <div class="list">
+    <div class="card"><span class="ico">A</span><div>faster-whisper<small>文字起こしAI。モデルは large-v3-turbo</small></div></div>
+    <div class="card"><span class="ico">B</span><div>Claude API<small>要約・整形</small></div></div>
+    <div class="card"><span class="ico">C</span><div>Python ＋ GUI ＋ exe化<small>Pythonが入っていないPCでも動く</small></div></div>
+    <div class="card"><span class="ico">D</span><div>Claude Code<small>仕様書を書いて、実装はAIと二人三脚</small></div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 8. 手間 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>作るのにかかった手間</h2>
+  <div class="effort-stat"><b>休日2日</b><span>Claude Code の上限を<br>使い切るまで</span></div>
+  <div class="who">
+    <div class="card"><h3>自分がやったこと</h3><ul><li>欲しい機能を決める</li><li>画面の使い勝手を詰める</li><li>CPUかGPUかを判断</li></ul></div>
+    <div class="card"><h3>AIがやったこと</h3><ul><li>コードを書く</li></ul></div>
+  </div>
+  <div class="card stuck">
+    <h3>つまずいたところ</h3>
+    <p>文字起こしに何の機能が必要か<small>画面と機能を詰めるのに一番時間がかかった</small></p>
+    <p>最初はCPUで動かしたら想像以上に遅い<small>GPUに切り替えたら一気に速くなった</small></p>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 9. まとめ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #01</span><span class="page"></span></div>
+  <h2>最後まで見てくれて<br>ありがとうございます</h2>
+  <div class="cta">
+    <div class="card hot">コメントで「欲しい」<small>反応を見て、配布や作り方の解説を考えます</small></div>
+    <div class="card">あとで見返すなら保存</div>
+  </div>
+  <div class="me">
+    <img class="av" src="../_shared/avatar.jpg" alt="">
+    <div><b>@takato.engineer</b><br>本業インフラエンジニア。<br>自宅ではAIで「面倒」を自動化しています。</div>
+  </div>
+</section>
+
+<script>
+  // ?n=3 のように指定すると、その 1 枚だけを表示する（書き出し用）
+  const slides = document.querySelectorAll('.slide');
+  slides.forEach((el, i) => { const pg = el.querySelector('.page'); if (pg) pg.textContent = `${i + 1}/${slides.length}`; });
+  const q = new URLSearchParams(location.search);
+  if (q.get('theme')) document.body.dataset.theme = q.get('theme');
+  const n = Number(q.get('n'));
+  if (n) {
+    document.body.classList.add('single');
+    slides[n - 1]?.classList.add('on');
+  }
+</script>
+</body>
+</html>

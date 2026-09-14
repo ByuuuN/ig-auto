@@ -17,6 +17,14 @@ export async function publishingLimit() {
   return { used: row.quota_usage ?? null, max: row.config?.quota_total ?? null };
 }
 
+// 同じ本文の投稿が直近にあれば、その media_id を返す（再実行による二重投稿の防止）
+export async function findPublishedWithCaption(caption, { limit = 10 } = {}) {
+  const res = await get(userPath('media'), { fields: 'id,caption', limit: String(limit) });
+  const norm = (t) => String(t || '').replace(/\r\n/g, '\n').trim();
+  const hit = (res.data || []).find((m) => norm(m.caption) === norm(caption));
+  return hit ? hit.id : null;
+}
+
 export async function createImageContainer(imageUrl, { caption, carouselItem = false } = {}) {
   const params = { image_url: imageUrl };
   if (carouselItem) params.is_carousel_item = 'true';
