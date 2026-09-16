@@ -1,7 +1,7 @@
 {
   "id": "001-autoscribe",
   "type": "carousel",
-  "status": "ready",
+  "status": "published",
   "scheduled_for": "2026-09-16T20:45:00+09:00",
   "images": [
     "001-autoscribe-01.jpg",
@@ -26,5 +26,7 @@
     "エンジニア",
     "インフラエンジニア"
   ],
-  "source_note": "文字起こし/（AutoScribe）の README の実測値・機能説明と、本人への聞き取り（制作期間・つまずき）から作成"
+  "source_note": "文字起こし/（AutoScribe）の README の実測値・機能説明と、本人への聞き取り（制作期間・つまずき）から作成",
+  "media_id": "18034984493833579",
+  "published_at": "2026-09-16T15:36:18.357Z"
 }
