@@ -23,3 +23,8 @@ tmp/
 
 # 分析データ（公開リポジトリに載せない）
 data/
+
+# AI 会社の設定・ネタ帳・事実メモ（非公開。この PC の中だけに置く）
+.claude/
+content/ideas.md
+content/facts.md

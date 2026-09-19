@@ -73,10 +73,26 @@
 - ループ内から `media_publish` を呼ばない（連投はスパム判定の原因になる）
 - 認証が通っていない段階で投稿系のコードを書かない
 
+## AI 会社の運用
+
+社長（本人）の下に、秘書室と 3 つの部署を置いて運用する。設定はこの PC の中だけに置く（`.claude/` と
+`content/ideas.md`・`content/facts.md` は `.gitignore` 済み。公開リポジトリには載せない）。
+
+| 役職 | 実体 | 仕事 |
+| --- | --- | --- |
+| 秘書室 | メインの Claude（`/brief`・`/new-post`） | 朝の報告、各部署への仕事の振り分け、承認後の予約 |
+| 企画部 | `.claude/agents/kikaku.md` | ネタ候補を根拠つきで出す。ネタ帳の管理 |
+| 制作部 | `.claude/agents/seisaku.md` | スライドと本文を作り、下書きにする |
+| 校閲・法務部 | `.claude/agents/kouetsu.md` | 事実・誇大表現・PR 表記・情報漏れを公開前にチェック |
+
+- 数字と体験談は `content/facts.md`（社長が確認した事実）か素材ファイルにあるものだけを使う
+- 公開の承認・返信の送信・実体験の中身は社長の仕事。AI に任せない
+- Pro プランのため、集計はスクリプト（`npm run brief`・`npm run insights`）で行い、AI の使用量を抑える
+
 ## 実装の順序
 
 1. ~~`src/client.js` — API ラッパ~~ 完了
 2. ~~`scripts/whoami.js` — 疎通確認~~ 完了（2026-09-13 疎通 OK）
 3. ~~`src/auth/refresh.js` — 長期トークンの更新~~ 完了（`npm run auth:refresh`）
 4. 投稿系 — `scripts/post-next.js` 実装済み。DRY_RUN でのテストのみ済、実投稿は未実施
-5. インサイト取得
+5. ~~インサイト取得~~ 完了（`npm run insights`。記録は `data/insights/`、Git に含めない）

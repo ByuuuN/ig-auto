@@ -8,7 +8,8 @@
     "whoami": "node scripts/whoami.js",
     "auth:refresh": "node src/auth/refresh.js",
     "post": "node scripts/post-next.js",
-    "insights": "node scripts/insights.js"
+    "insights": "node scripts/insights.js",
+    "brief": "node scripts/brief.js"
   },
   "engines": {
     "node": ">=20"
