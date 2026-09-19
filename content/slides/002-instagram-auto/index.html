@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>002 Instagram 自動投稿</title>
+<link rel="stylesheet" href="../_shared/base.css">
+<style>
+  .code { display: block; font-family: "Consolas", monospace; font-size: 32px; font-weight: 700; line-height: 1.4; }
+  .ng { background: #eeeae2; color: var(--sub); }
+  .ok-ico { background: var(--accent); color: var(--on-accent); }
+  .timeline { gap: 18px; }
+  .timeline .card { font-size: 34px; padding: 24px 40px; }
+  .timeline + .stuck { margin-top: 24px !important; padding: 28px 40px; }
+  .timeline b.em { font-size: 44px; }
+  .cost { font-size: 150px; font-weight: 900; color: var(--accent); line-height: 1; margin: 8px 0 40px; }
+</style>
+</head>
+<body>
+
+<!-- 1. 表紙 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h1>この投稿、<br><span class="mark">AIが作った仕組み</span>で<br><span class="em">自動投稿しています</span></h1>
+  <p class="lead" style="margin-top:40px">コードを書かないインフラエンジニアが<br>Instagram の投稿を自動化するまで</p>
+  <div class="list" style="margin-top:auto">
+    <div class="card"><span class="ico">!</span><div>つまずきポイント4つも正直に</div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+  <div class="swipe">スワイプ →</div>
+</section>
+
+<!-- 2. なぜ作った -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2>作った理由</h2>
+  <div class="list">
+    <div class="card"><span class="ico">1</span><div>運用は 1 日 30 分以内にしたい<small>投稿作業に時間を取られたくない</small></div></div>
+    <div class="card"><span class="ico">2</span><div>お金はかけない<small>有料の予約投稿ツールは使わない</small></div></div>
+  </div>
+  <p class="lead" style="margin-top:56px">かかった費用</p>
+  <div class="cost">0円</div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 3. しくみ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2>しくみ</h2>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><div>スライドを作る<small>AIがHTMLで作成 → 画像に書き出し</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">2</span><div>画像をネット上に置く<small>GitHub（無料）の公開フォルダ</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">3</span><div>予定の時間になったら起動<small>Google Apps Script（無料）が5分おきに確認</small></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">4</span><div>Instagram に投稿<small>GitHub Actions（無料）が公式 API で投稿</small></div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 4. つまずき① -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2><span class="em">つまずき①</span><br>Facebookアカウントが要る</h2>
+  <div class="list">
+    <div class="card"><span class="ico">?</span><div>Instagram の投稿なのに…<small>開発者登録には<br>Facebook アカウントでのログインが必要</small></div></div>
+    <div class="card"><span class="ico">✓</span><div>ただし Facebook ページは不要<small>「アカウント」と「ページ」は別物。<br>ここで混乱した</small></div></div>
+  </div>
+  <p class="note">ネットの解説記事の多くは、Facebook ページを連携する古い方式。<br>そのまま真似すると、今の方式では失敗します。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 5. つまずき② -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2><span class="em">つまずき②</span><br>IDが2種類ある</h2>
+  <div class="list">
+    <div class="card"><span class="ico ng">✕</span><div>Meta アプリ ID<small>管理画面の URL に出ている番号。これではない</small></div></div>
+    <div class="card"><span class="ico ok-ico">◯</span><div>Instagram アプリ ID<small>Instagram の設定画面の中にある、別の番号</small></div></div>
+  </div>
+  <p class="note">取り違えると認証が通りません。<br>アカウントの ID も、画面に出る番号と API で使う番号が違いました。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 6. つまずき③ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2><span class="em">つまずき③</span><br>名前がほぼ同じ権限</h2>
+  <div class="list">
+    <div class="card"><span class="ico ok-ico">◯</span><div><span class="code">instagram_business_<br>content_publish</span><small>今の方式で投稿に必要な権限</small></div></div>
+    <div class="card"><span class="ico ng">✕</span><div><span class="code">instagram_<br>content_publish</span><small>古い方式の権限。一覧で隣に並んでいる</small></div></div>
+  </div>
+  <p class="note">違いは「business」があるかどうかだけ。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 7. つまずき④ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2><span class="em">つまずき④</span><br>予約投稿が遅れた</h2>
+  <div class="list timeline">
+    <div class="card"><span class="ico">1</span><div>21時に予約<small>無料の GitHub Actions で自動実行</small></div></div>
+    <div class="card"><span class="ico">2</span><div>1日目：<b class="em">動かず</b><small>予約した実行が始まらなかった</small></div></div>
+    <div class="card"><span class="ico">3</span><div>2日目：<b class="em">深夜0:36</b>に投稿<small>約3時間半の遅れ</small></div></div>
+  </div>
+  <div class="card stuck" style="margin-top:auto"><h3>解決した方法</h3><p>Google Apps Script を「時計役」に<small>5分おきに確認して、時間になったら起動する。<br>いまは予定時刻から数分で投稿されます（これも無料）</small></p></div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 8. 事故を防ぐ工夫 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2>自動化で<br>事故らないための工夫</h2>
+  <div class="list">
+    <div class="card"><span class="ico">1</span><div>最初は「投稿しないモード」<small>中身とチェック結果だけ表示して、本番は確認してから</small></div></div>
+    <div class="card"><span class="ico">2</span><div>同じ投稿を二度出さない<small>投稿前に、同じ本文が投稿済みでないかを確認</small></div></div>
+    <div class="card"><span class="ico">3</span><div>画像を事前にチェック<small>形式・縦横比・ネットから見られるかを確認</small></div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 9. 手間 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2>作るのにかかった手間</h2>
+  <div class="effort-stat"><b>2日</b><span>登録・設定から<br>初回投稿の準備まで</span></div>
+  <div class="who">
+    <div class="card"><h3>自分がやったこと</h3><ul><li>Meta の登録と設定</li><li>発信の方向性を決める</li><li>デザインを選ぶ</li></ul></div>
+    <div class="card"><h3>AIがやったこと</h3><ul><li>コードを書く</li><li>手順を調べる</li><li>スライドを作る</li></ul></div>
+  </div>
+  <div class="card stuck">
+    <h3>いちばん大変だったところ</h3>
+    <p>Meta の開発者画面<small>解説記事と実際の画面が違い、AIと一緒に調べ直しながら進めた</small></p>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 10. まとめ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #02</span><span class="page"></span></div>
+  <h2>最後まで見てくれて<br>ありがとうございます</h2>
+  <div class="cta">
+    <div class="card hot">自分でもやってみたい人は保存<small>つまずきポイントを先に知っておくだけで<br>かなり楽になります</small></div>
+    <div class="card">質問はコメントでどうぞ</div>
+  </div>
+  <div class="me">
+    <img class="av" src="../_shared/avatar.jpg" alt="">
+    <div><b>@takato.engineer</b><br>本業インフラエンジニア。<br>自宅ではAIで「面倒」を自動化しています。</div>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  slides.forEach((el, i) => { const pg = el.querySelector('.page'); if (pg) pg.textContent = `${i + 1}/${slides.length}`; });
+  const q = new URLSearchParams(location.search);
+  if (q.get('theme')) document.body.dataset.theme = q.get('theme');
+  const n = Number(q.get('n'));
+  if (n) {
+    document.body.classList.add('single');
+    slides[n - 1]?.classList.add('on');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "id": "002-instagram-auto",
+  "type": "carousel",
+  "status": "ready",
+  "scheduled_for": "2026-09-20T21:00:00+09:00",
+  "images": [
+    "002-instagram-auto-01.jpg",
+    "002-instagram-auto-02.jpg",
+    "002-instagram-auto-03.jpg",
+    "002-instagram-auto-04.jpg",
+    "002-instagram-auto-05.jpg",
+    "002-instagram-auto-06.jpg",
+    "002-instagram-auto-07.jpg",
+    "002-instagram-auto-08.jpg",
+    "002-instagram-auto-09.jpg",
+    "002-instagram-auto-10.jpg"
+  ],
+  "caption": "この投稿は、AIが作った仕組みで自動投稿しています。\n\n運用は1日30分以内、お金はかけない。\nそう決めて、Instagramの投稿を自動化しました。かかった費用は0円です。\n\n▼しくみ\nスライドをAIが作る → 画像をGitHubに置く → Google Apps Scriptが5分おきに時間を確認 → GitHub Actionsが公式APIで投稿\n\n▼つまずいたところ\n① 開発者登録にFacebookアカウントが必要（Facebookページは不要）\n② アプリIDが2種類あって、取り違えると認証が通らない\n③ 名前がほぼ同じ権限が並んでいて、違いは「business」の有無だけ\n④ 21時の予約が1日目は動かず、2日目は深夜0:36に投稿された\n\nネットの解説記事の多くは古い方式なので、そのまま真似するとつまずきます。\n予約の遅れは、無料のGoogle Apps Scriptを「時計役」にして解決しました。いまは予定時刻から数分で投稿されます。\n\n▼かかった手間\n登録・設定から初回投稿の準備まで2日。\nコードを書くのと手順の調査はAI、Metaの登録や方向性・デザインを決めるのは自分、という分担でした。\n\n自分でもやってみたい人は、保存しておくとつまずかずに済みます。\n\n本業はインフラエンジニア。コードは自分では書かず、AIに書かせています。",
+  "hashtags": [
+    "インスタ運用",
+    "SNS運用",
+    "自動化",
+    "業務効率化",
+    "AI活用",
+    "ClaudeCode",
+    "個人開発",
+    "GitHub",
+    "インフラエンジニア"
+  ],
+  "source_note": "2026-09-13〜17 の Instagram 自動投稿パイプライン構築の実体験（docs/setup.md、Actions の実行記録）から作成"
+}
