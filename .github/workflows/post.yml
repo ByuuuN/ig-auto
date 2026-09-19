@@ -1,9 +1,14 @@
 # 予約投稿用のワークフロー。
 #
-# - 手動実行（Actions タブの Run workflow）は既定で DRY_RUN。投稿はしない
-# - 予約実行（schedule）は実際に投稿する。キューの status が ready で、
-#   scheduled_for を過ぎたものが 1 件だけ対象になる
-# - 止めたいとき: Actions タブ → post → 右上の「…」→ Disable workflow
+# 起動のされ方は 3 通り:
+# - 時計役（Google Apps Script, tools/gas-scheduler）: 5 分おきにキューを確認し、
+#   予定時刻を過ぎた投稿があれば dry_run=false で起動する。これがメイン
+# - 予約実行（schedule）: 時計役が止まっていたときの予備。数時間遅れることがある
+# - 手動実行（Actions タブの Run workflow）: 既定で DRY_RUN。投稿はしない
+#
+# どの起動でも、投稿されるのは status が ready で scheduled_for を過ぎたものだけ。
+# 1 回の実行で最大 1 件。同じ本文が投稿済みなら投稿しない。
+# 止めたいとき: Actions タブ → post → 右上の「…」→ Disable workflow
 name: post
 
 on:
@@ -15,14 +20,8 @@ on:
         options: ['true', 'false']
         default: 'true'
   schedule:
-    # Actions の予約は混雑で遅れたり飛ばされたりする（9/15 は 2 回とも開始されなかった）。
-    # そのため 15 分おきに何度も仕込む。投稿済みなら後続の実行は何もしない
-    # （キューから外れる＋同じ本文の投稿を API で確認する）。
-    # 時刻は UTC。混雑しやすい 0 分ちょうどを避けている。
-    - cron: '7 23 15 9 *'                # 9/16 08:07 JST — 予約実行が動くかの確認（予定時刻前なので投稿しない）
-    - cron: '7 3 16 9 *'                 # 9/16 12:07 JST — 同上
-    - cron: '52 11 16 9 *'               # 9/16 20:52 JST — 001-autoscribe
-    - cron: '7,22,37,52 12-14 16 9 *'    # 9/16 21:07〜23:52 JST — 予備（15 分おき）
+    # 予備。Actions の予約は 2〜5 時間遅れることがある（2026-09 の実測）。時刻は UTC
+    - cron: '37 */2 * * *'
 
 permissions:
   contents: write   # 投稿済みのキューを commit するため

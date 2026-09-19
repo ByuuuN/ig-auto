@@ -147,3 +147,43 @@ pages/index.html がそれを画面に表示するので、コピーする。
 - テスター招待の承認は PC ブラウザの instagram.com → 設定 → アプリとウェブサイト で行う
 - **ダッシュボードに表示される ID は `IG_USER_ID` に使えない。**
   `npm run whoami` が返す `user_id`（17841… で始まる 17 桁）を使う
+
+---
+
+## 予約投稿の時計役（Google Apps Script）
+
+GitHub Actions の予約実行（schedule）は 2〜5 時間遅れることがある（2026-09 の実測。
+1 回目は実行自体が始まらなかった）。一方で、外部から起動（workflow_dispatch）すれば
+すぐに動く。そこで、Google Apps Script を「時計役」にして、5 分おきにキューを確認し、
+予定時刻を過ぎた投稿があれば Actions を起動する。
+
+コードは `tools/gas-scheduler/Code.gs`。トークンはコードに書かず、スクリプト プロパティに置く。
+
+### 1. GitHub のトークンを作る（Fine-grained token）
+
+https://github.com/settings/personal-access-tokens/new
+
+| 項目 | 値 |
+| --- | --- |
+| Token name | `ig-auto scheduler` |
+| Expiration | 90 days（期限が来たら作り直して、スクリプト プロパティを更新する） |
+| Repository access | **Only select repositories** → `ig-auto` だけ |
+| Permissions → Actions | **Read and write** |
+| Permissions → Contents | Read-only |
+
+このトークンでできるのは「ig-auto のワークフローの起動・確認」と「中身の読み取り」だけ。
+コードの書き換えや Secrets の読み取りはできない。起動されても、投稿されるのは
+予定時刻を過ぎた ready の投稿だけ。
+
+### 2. Apps Script に登録する
+
+1. https://script.google.com/ →「新しいプロジェクト」。名前は `ig-auto scheduler`
+2. 最初からある `コード.gs` の中身を消して、`tools/gas-scheduler/Code.gs` を貼り付けて保存
+3. 左の ⚙「プロジェクトの設定」→ 一番下「スクリプト プロパティ」→ 追加
+   - プロパティ: `GITHUB_TOKEN` / 値: 1 で作ったトークン
+4. エディタに戻り、上の関数の選択で `setup` を選んで「実行」
+   - 初回は Google の承認画面が出る（「詳細」→「安全ではないページに移動」→ 許可）。
+     自分で作ったスクリプトなので問題ない
+5. 同じように `testDryRun` を実行 → GitHub の Actions タブに実行が 1 件増え、成功すれば OK
+
+止めたいときは `stop` を実行する（または Actions 側で Disable workflow）。
