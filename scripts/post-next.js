@@ -20,6 +20,7 @@ import {
   publishingLimit,
   createImageContainer,
   createCarouselContainer,
+  createReelContainer,
   waitUntilReady,
   publishContainer,
   findPublishedWithCaption,
@@ -62,10 +63,10 @@ async function main() {
 
     const { item } = next;
     const caption = buildCaption(item);
-    const urls = (item.images || []).map(imageUrl);
+    const urls = item.type === 'reel' ? [imageUrl(item.video)] : (item.images || []).map(imageUrl);
 
     console.log(`対象   : ${next.file}（id ${item.id} / ${item.type}）`);
-    console.log(`画像   : ${urls.length} 枚`);
+    console.log(item.type === 'reel' ? '動画   :' : `画像   : ${urls.length} 枚`);
     urls.forEach((u) => console.log(`  - ${u}`));
     console.log('本文   :');
     console.log(caption.split('\n').map((l) => `  | ${l}`).join('\n'));
@@ -104,13 +105,16 @@ async function main() {
     let containerId;
     if (item.type === 'image') {
       containerId = await createImageContainer(urls[0], { caption });
+    } else if (item.type === 'reel') {
+      containerId = await createReelContainer(urls[0], caption);
     } else {
       const children = [];
       for (const u of urls) children.push(await createImageContainer(u, { carouselItem: true }));
       for (const id of children) await waitUntilReady(id);
       containerId = await createCarouselContainer(children, caption);
     }
-    await waitUntilReady(containerId);
+    // 動画は Instagram 側の変換に時間がかかる（最大 5 分待つ）
+    await waitUntilReady(containerId, item.type === 'reel' ? { tries: 60, intervalMs: 5000 } : {});
 
     const mediaId = await publishContainer(containerId);
     const dest = markPublished(next, mediaId);

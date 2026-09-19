@@ -32,13 +32,20 @@ export async function createImageContainer(imageUrl, { caption, carouselItem = f
   return (await post(userPath('media'), params)).id;
 }
 
+// リール。thumb_offset はカバーに使う位置（ミリ秒）
+export async function createReelContainer(videoUrl, caption, { thumbOffsetMs = 1000 } = {}) {
+  const params = { media_type: 'REELS', video_url: videoUrl, share_to_feed: 'true', thumb_offset: String(thumbOffsetMs) };
+  if (caption) params.caption = caption;
+  return (await post(userPath('media'), params)).id;
+}
+
 export async function createCarouselContainer(childIds, caption) {
   const params = { media_type: 'CAROUSEL', children: childIds.join(',') };
   if (caption) params.caption = caption;
   return (await post(userPath('media'), params)).id;
 }
 
-// コンテナが FINISHED になるまで待つ。画像なら通常は数秒
+// コンテナが FINISHED になるまで待つ。画像なら通常は数秒、動画は数十秒〜数分
 export async function waitUntilReady(containerId, { tries = 10, intervalMs = 3000 } = {}) {
   for (let i = 0; i < tries; i++) {
     const { status_code: status } = await get(containerId, { fields: 'status_code' });

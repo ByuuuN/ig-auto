@@ -4,7 +4,8 @@
 //   draft     下書き。投稿対象にならない
 //   ready     投稿してよい。scheduled_for が null か過去なら対象
 //   published 投稿済み（content/published/ に移動される）
-import { readdirSync, readFileSync, existsSync, writeFileSync, renameSync, mkdirSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync, writeFileSync, renameSync, mkdirSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join, extname, basename } from 'node:path';
 
 export const QUEUE_DIR = process.env.QUEUE_DIR || 'content/queue';
@@ -16,6 +17,9 @@ const HASHTAG_MAX = 30;
 const CAROUSEL_MAX = 10;
 const RATIO_MIN = 4 / 5; // 縦長の限界
 const RATIO_MAX = 1.91; // 横長の限界
+const VIDEO_MAX_MB = 95; // GitHub の 1 ファイル上限（100MB）より少し小さく
+const REEL_MIN_SEC = 3;
+const REEL_MAX_SEC = 15 * 60;
 
 export function loadQueue() {
   if (!existsSync(QUEUE_DIR)) return [];
@@ -62,18 +66,42 @@ export function jpegSize(buf) {
   return null;
 }
 
+// ffprobe があれば長さを調べる（GitHub Actions など無い環境では null）
+function videoSeconds(path) {
+  try {
+    const out = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path], { encoding: 'utf8' });
+    return Number(out.trim());
+  } catch {
+    return null;
+  }
+}
+
+function validateVideo(name) {
+  if (!name) return ['type=reel には video（動画のファイル名）が必要です'];
+  if (extname(name).toLowerCase() !== '.mp4') return [`${name}: MP4 にしてください`];
+  const path = join(ASSETS_DIR, name);
+  if (!existsSync(path)) return [`${name}: ${ASSETS_DIR} にありません`];
+  const errors = [];
+  const mb = statSync(path).size / 1024 / 1024;
+  if (mb > VIDEO_MAX_MB) errors.push(`${name}: ${mb.toFixed(0)}MB は大きすぎます（${VIDEO_MAX_MB}MB まで）`);
+  const sec = videoSeconds(path);
+  if (sec !== null && (sec < REEL_MIN_SEC || sec > REEL_MAX_SEC)) errors.push(`${name}: 長さ ${sec.toFixed(1)} 秒は範囲外です（3 秒〜15 分）`);
+  return errors;
+}
+
 // 問題の一覧を返す。空なら投稿可能
 export function validate(item) {
   const errors = [];
   const images = item.images || [];
 
-  if (!['image', 'carousel'].includes(item.type)) errors.push(`未対応の type です: ${item.type}`);
+  if (!['image', 'carousel', 'reel'].includes(item.type)) errors.push(`未対応の type です: ${item.type}`);
+  if (item.type === 'reel') errors.push(...validateVideo(item.video));
   if (item.type === 'image' && images.length !== 1) errors.push('type=image は画像 1 枚にしてください');
   if (item.type === 'carousel' && (images.length < 2 || images.length > CAROUSEL_MAX)) {
     errors.push(`type=carousel は画像 2〜${CAROUSEL_MAX} 枚にしてください（現在 ${images.length} 枚）`);
   }
 
-  for (const name of images) {
+  for (const name of item.type === 'reel' ? [] : images) {
     if (!['.jpg', '.jpeg'].includes(extname(name).toLowerCase())) {
       errors.push(`${name}: JPEG（.jpg）にしてください`);
       continue;

@@ -1,0 +1,19 @@
+{
+  "id": "001-autoscribe-reel",
+  "type": "reel",
+  "status": "draft",
+  "scheduled_for": null,
+  "video": "001-autoscribe-reel.mp4",
+  "caption": "動画をフォルダに放り込むだけで、文字起こし＋AI要約まで終わるツールを作りました。\n\n・音声／動画を入れると自動で文字起こし\n・本文／時刻付き／字幕／AI要約をまとめて出力\n・89秒の音声がGPUで3.4秒\n・音声ファイルは外に送らず、PCの中で処理\n\n作るのにかかったのは休日2日。コードはAIが書き、自分は欲しい機能と使い勝手を決めました。\n\n使ってみたい人は、コメントで「欲しい」と教えてください。\n\n本業はインフラエンジニア。コードは自分では書かず、AIに書かせています。\n\nナレーション：VOICEVOX:ずんだもん",
+  "hashtags": [
+    "文字起こし",
+    "業務効率化",
+    "自動化",
+    "AI活用",
+    "ClaudeCode",
+    "個人開発",
+    "インフラエンジニア",
+    "ずんだもん"
+  ],
+  "source_note": "content/reels/001-autoscribe/script.json（台本）。事実は facts.md の AutoScribe（001）と 文字起こし/README.md"
+}
