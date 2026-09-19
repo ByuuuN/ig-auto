@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>003 コードを書かない人がAIで作るときつまずくところ</title>
+<link rel="stylesheet" href="../_shared/base.css">
+</head>
+<body>
+
+<!-- 1. 表紙 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h1>コードを書かない僕が<br>AIでモノを作って<br><span class="mark">つまずいたところ</span></h1>
+  <p class="lead" style="margin-top:40px">自宅で4つのアプリを作って<br>気づいたこと</p>
+  <div class="list" style="margin-top:auto">
+    <div class="card"><span class="ico">!</span><div>つまずいたところも正直に</div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+  <div class="swipe">スワイプ →</div>
+</section>
+
+<!-- 2. 今まで作った4つ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>今まで作った<br>4つのアプリ</h2>
+  <div class="list">
+    <div class="card"><span class="ico">1</span><div>文字起こし＆要約ツール<small>AutoScribe</small></div></div>
+    <div class="card"><span class="ico">2</span><div>Instagram自動投稿の仕組み<small>この投稿も、その仕組みで公開しています</small></div></div>
+    <div class="card"><span class="ico">3</span><div>SF6戦績ツール</div></div>
+    <div class="card"><span class="ico">4</span><div>VS.NOTE</div></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 3. つまずき① -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2><span class="em">つまずき①</span><br>目的がふわっとしたまま<br>始めてしまう</h2>
+  <div class="list">
+    <div class="card"><span class="ico">?</span><div>SF6戦績ツール・VS.NOTEを<br>作ったとき<small>自分のしたいことを明確にする作業に、一番時間がかかりました</small></div></div>
+  </div>
+  <p class="note" style="margin-top:auto">自分でコードを書かない分、「何を作りたいか」を先に言葉にしておかないと、AIとの壁打ちがどんどん長引きます。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 4. つまずき② -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2><span class="em">つまずき②</span><br>見様見真似で<br>仕組みを作ってしまう</h2>
+  <div class="list">
+    <div class="card"><span class="ico">!</span><div>文字起こしツールも<br>自動投稿の仕組みも<small>見様見真似でClaude Codeに壁打ちしながら作ったので、形になるまでに時間がかかりました</small></div></div>
+  </div>
+  <p class="note" style="margin-top:auto">最初から正解の手順が分かっているわけではないので、試しては直しての繰り返しになります。</p>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 5. 実例1 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>実例①<br>文字起こしツールの場合</h2>
+  <div class="card stuck" style="margin-top:8px">
+    <h3>いちばん大変だったところ</h3>
+    <p>欲しい機能を決める作業<small>文字起こしに何の機能が必要かを詰めるのに、一番時間がかかった</small></p>
+    <p>動かしてみて分かったこと<small>最初はCPUで動かしたら遅く、GPUにしたら速くなった</small></p>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 6. 実例2 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>実例②<br>Instagram自動投稿の場合</h2>
+  <div class="list">
+    <div class="card"><span class="ico">!</span><div>21時に予約した投稿が<br>翌日深夜0:36に投稿<small>約3時間半、遅れて投稿されました</small></div></div>
+  </div>
+  <div class="card stuck" style="margin-top:auto"><h3>解決した方法</h3><p>Google Apps Scriptを「時計役」に<small>5分おきに確認する仕組みを追加（9/20導入）</small></p></div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 7. 一番伝えたいこと -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>一番<br>伝えたいこと</h2>
+  <p class="lead">作りたいものの<br><b style="color:var(--ink)">目的とゴールを先に決めておくこと</b></p>
+  <div class="cta" style="margin-top:auto">
+    <div class="card hot">自分でコードを書かないからこそ<small>妥協しない気持ちが要ります</small></div>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 8. 手間 -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>作るのにかかった手間</h2>
+  <div class="effort-stat"><b>4つ</b><span>自宅で作ったアプリ<br>全部で感じたこと</span></div>
+  <div class="who">
+    <div class="card"><h3>自分がやったこと</h3><ul><li>目的とゴールを決める</li><li>妥協せず要望を伝える</li></ul></div>
+    <div class="card"><h3>AIがやったこと</h3><ul><li>壁打ち相手になる</li><li>手順を調べる</li><li>コードを書く</li></ul></div>
+  </div>
+  <div class="card stuck">
+    <h3>共通のつまずき</h3>
+    <p>見様見真似で壁打ちしながら仕組みを作った<small>形になるまでに時間がかかりました</small></p>
+  </div>
+  <div class="foot"><b>@takato.engineer</b></div>
+</section>
+
+<!-- 9. まとめ -->
+<section class="slide">
+  <div class="top"><span class="tag">自宅AI開発ログ #03</span><span class="page"></span></div>
+  <h2>最後まで見てくれて<br>ありがとうございます</h2>
+  <div class="cta">
+    <div class="card hot">同じところでつまずいている人は保存<small>目的とゴールを先に決めておくだけで<br>だいぶ楽になります</small></div>
+    <div class="card">質問はコメントでどうぞ</div>
+  </div>
+  <div class="me">
+    <img class="av" src="../_shared/avatar.jpg" alt="">
+    <div><b>@takato.engineer</b><br>本業インフラエンジニア。<br>自宅ではAIで「面倒」を自動化しています。</div>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  slides.forEach((el, i) => { const pg = el.querySelector('.page'); if (pg) pg.textContent = `${i + 1}/${slides.length}`; });
+  const q = new URLSearchParams(location.search);
+  if (q.get('theme')) document.body.dataset.theme = q.get('theme');
+  const n = Number(q.get('n'));
+  if (n) {
+    document.body.classList.add('single');
+    slides[n - 1]?.classList.add('on');
+  }
+</script>
+</body>
+</html>
