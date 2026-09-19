@@ -7,7 +7,8 @@
   "scripts": {
     "whoami": "node scripts/whoami.js",
     "auth:refresh": "node src/auth/refresh.js",
-    "post": "node scripts/post-next.js"
+    "post": "node scripts/post-next.js",
+    "insights": "node scripts/insights.js"
   },
   "engines": {
     "node": ">=20"
