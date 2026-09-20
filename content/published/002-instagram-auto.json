@@ -1,7 +1,7 @@
 {
   "id": "002-instagram-auto",
   "type": "carousel",
-  "status": "ready",
+  "status": "published",
   "scheduled_for": "2026-09-20T21:00:00+09:00",
   "images": [
     "002-instagram-auto-01.jpg",
@@ -27,5 +27,7 @@
     "GitHub",
     "インフラエンジニア"
   ],
-  "source_note": "2026-09-13〜17 の Instagram 自動投稿パイプライン構築の実体験（docs/setup.md、Actions の実行記録）から作成"
+  "source_note": "2026-09-13〜17 の Instagram 自動投稿パイプライン構築の実体験（docs/setup.md、Actions の実行記録）から作成",
+  "media_id": "18623069872001428",
+  "published_at": "2026-09-20T12:03:15.504Z"
 }
