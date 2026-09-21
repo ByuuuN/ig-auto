@@ -15,6 +15,7 @@ import {
   imageUrl,
   checkReachable,
   markPublished,
+  markError,
 } from '../src/publish/queue.js';
 import {
   publishingLimit,
@@ -52,10 +53,12 @@ async function checkLimit() {
 }
 
 async function main() {
+  let next = null;
+  let dryRun = true;
   try {
-    const { dryRun } = config();
+    dryRun = config().dryRun;
     const ignoreSchedule = dryRun && process.argv.includes('--ignore-schedule');
-    const next = pickNext(loadQueue(), ignoreSchedule ? new Date(8.64e15) : new Date());
+    next = pickNext(loadQueue(), ignoreSchedule ? new Date(8.64e15) : new Date());
     if (!next) {
       console.log('投稿対象がありません（status が ready で、予定時刻を過ぎたものが無い）');
       return 0;
@@ -79,6 +82,7 @@ async function main() {
     if (errors.length) {
       console.error('\n投稿できません:');
       errors.forEach((e) => console.error(`  - ${e}`));
+      if (!dryRun) markError(next, errors.join(' / '));
       return 1;
     }
 
@@ -121,6 +125,11 @@ async function main() {
     console.log(`\n公開しました（media_id ${mediaId}）→ ${dest}`);
   } catch (err) {
     console.error('失敗:', mask(err.message));
+    // 本番で失敗したら、その投稿を error にして再挑戦を止める（5 分おきに失敗し続けないように）
+    if (next && !dryRun) {
+      markError(next, mask(err.message));
+      console.error(`${next.item.id} を status=error にしました。原因を直してから ready に戻してください。`);
+    }
     return 1;
   }
   return 0;

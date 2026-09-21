@@ -20,11 +20,14 @@ export function config() {
   };
 }
 
-// ログやエラーにトークンが出ないようにする
+// ログやエラーにトークンや ID が出ないようにする
 export function mask(text) {
   const token = process.env.IG_ACCESS_TOKEN;
   let out = String(text);
   if (token) out = out.split(token).join('***');
+  // 公開リポジトリの Actions のログは誰でも見られるので、ID も伏せる
+  const userId = process.env.IG_USER_ID;
+  if (userId) out = out.split(userId).join('***');
   return out.replace(/access_token=[^&\s"]+/g, 'access_token=***');
 }
 

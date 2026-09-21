@@ -4,6 +4,7 @@
 //   draft     下書き。投稿対象にならない
 //   ready     投稿してよい。scheduled_for が null か過去なら対象
 //   published 投稿済み（content/published/ に移動される）
+//   error     投稿に失敗した。自動では再挑戦しない。原因を直してから ready に戻す
 import { readdirSync, readFileSync, existsSync, writeFileSync, renameSync, mkdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, extname, basename } from 'node:path';
@@ -142,6 +143,19 @@ export async function checkReachable(url) {
   const res = await fetch(url, { method: 'HEAD' });
   if (!res.ok) return `${url} → HTTP ${res.status}（画像を push しましたか？）`;
   return null;
+}
+
+// 公開リポジトリに残すので、ID のような長い数字と URL のパスは伏せる
+export function sanitizeError(message) {
+  return String(message)
+    .replace(/(GET|POST) \/\S+/g, '$1 (API)')
+    .replace(/\d{10,}/g, '***')
+    .slice(0, 300);
+}
+
+export function markError({ file, item }, message) {
+  const failed = { ...item, status: 'error', last_error: sanitizeError(message), last_error_at: new Date().toISOString() };
+  writeFileSync(file, JSON.stringify(failed, null, 2) + '\n');
 }
 
 export function markPublished({ file, item }, mediaId) {

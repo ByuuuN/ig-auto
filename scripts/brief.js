@@ -24,6 +24,9 @@ function queueStatus() {
   const ready = items.filter((i) => i.status === 'ready')
     .sort((a, b) => String(a.scheduled_for).localeCompare(String(b.scheduled_for)));
   const drafts = items.filter((i) => i.status === 'draft');
+  for (const i of items.filter((x) => x.status === 'error')) {
+    console.log(`- **投稿に失敗して止まっている**: ${i.id}（${jst(i.last_error_at)}）${i.last_error}`);
+  }
   if (!ready.length) console.log('- 予約済みの投稿: なし');
   for (const i of ready) console.log(`- 予約済み: ${i.id}（${i.scheduled_for ? jst(i.scheduled_for) : '即時'}）`);
   for (const i of drafts) console.log(`- 下書き: ${i.id}`);
