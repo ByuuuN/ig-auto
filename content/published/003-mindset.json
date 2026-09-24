@@ -1,7 +1,7 @@
 {
   "id": "003-mindset",
   "type": "carousel",
-  "status": "ready",
+  "status": "published",
   "scheduled_for": "2026-09-24T21:00:00+09:00",
   "images": [
     "003-mindset-01.jpg",
@@ -25,5 +25,7 @@
     "非エンジニア",
     "AI開発"
   ],
-  "source_note": "content/facts.md の「AI開発でつまずくところ（003、2026-09-20社長回答）」節（共通の教訓／SF6・VS.NOTEのつまずき／一番伝えたいこと）、「AutoScribe（001）」節（機能を詰める作業・CPU/GPUの実測）、「Instagram自動投稿（002）」節（予約投稿の遅延と解決策）、「投稿に使ってよいもの」節（SF6戦績ツール・VS.NOTEの使用可否、配布リンク不可）から作成"
+  "source_note": "content/facts.md の「AI開発でつまずくところ（003、2026-09-20社長回答）」節（共通の教訓／SF6・VS.NOTEのつまずき／一番伝えたいこと）、「AutoScribe（001）」節（機能を詰める作業・CPU/GPUの実測）、「Instagram自動投稿（002）」節（予約投稿の遅延と解決策）、「投稿に使ってよいもの」節（SF6戦績ツール・VS.NOTEの使用可否、配布リンク不可）から作成",
+  "media_id": "18430269460182763",
+  "published_at": "2026-09-24T12:03:19.951Z"
 }
