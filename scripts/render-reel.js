@@ -1,12 +1,13 @@
-// スライド画像 + VOICEVOX のナレーション + 字幕から、リール用の縦長動画（1080x1920）を作る。
+// スライド・文字・ずんだもんの立ち絵から、リール用の縦長動画（1080x1920）を作る。
 // Windows のローカル専用。VOICEVOX を起動しておくこと（エンジンが 127.0.0.1:50021 で動く）。
 //
-//   node scripts/render-reel.js 001-autoscribe
+//   node scripts/render-reel.js 002-autoscribe-hallucination
 //
-// 入力: content/reels/<name>/script.json（台本）と content/assets/<slides>-NN.jpg（スライド画像）
+// 入力: content/reels/<name>/script.json（台本）
+//   scenes[].kind = "text"  … 大きな文字だけのシーン（冒頭のフック向け）
+//   scenes[].kind = "slide" … content/assets/<slides>-NN.jpg を見せるシーン
+//   character     … 立ち絵の画像。喋っているあいだ、ゆっくり上下に揺れる
 // 出力: content/assets/<id>.mp4
-//
-// 1 シーン = スライド 1 枚。シーンの中でゆっくりズームし、字幕はナレーションの 1 文ごとに切り替える。
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -16,8 +17,8 @@ import { pathToFileURL } from 'node:url';
 const W = 1080;
 const H = 1920;
 const FPS = 30;
-const GAP = 0.25; // 文と文のあいだの間（秒）
-const TAIL = 0.35; // シーンの最後の間（秒）
+const GAP = 0.2; // 文と文のあいだの間（秒）
+const TAIL = 0.3; // シーンの最後の間（秒）
 const ENGINE = process.env.VOICEVOX_URL || 'http://127.0.0.1:50021';
 const CHROME = process.env.CHROME_PATH || [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -39,7 +40,7 @@ async function tts(text) {
   const q = await fetch(`${ENGINE}/audio_query?${new URLSearchParams({ text, speaker: script.speaker })}`, { method: 'POST' });
   if (!q.ok) throw new Error(`VOICEVOX audio_query → HTTP ${q.status}（VOICEVOX は起動していますか？）`);
   const query = await q.json();
-  query.speedScale = script.speed ?? 1.1;
+  query.speedScale = script.speed ?? 1.15;
   query.prePhonemeLength = 0.05;
   query.postPhonemeLength = 0.1;
   const s = await fetch(`${ENGINE}/synthesis?speaker=${script.speaker}`, {
@@ -49,7 +50,6 @@ async function tts(text) {
   return Buffer.from(await s.arrayBuffer());
 }
 
-// WAV を「形式」と「PCM データ」に分ける（VOICEVOX は 16bit PCM）
 function parseWav(buf) {
   let p = 12;
   let fmt = null;
@@ -77,26 +77,34 @@ const seconds = (fmt, pcm) => pcm.length / (fmt.rate * fmt.channels * 2);
 
 // ---------- 画像 ----------
 
-const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const slideUrl = (n) => pathToFileURL(resolve('content/assets', `${script.slides}-${String(n).padStart(2, '0')}.jpg`)).href;
 
 function framesHtml(frames) {
-  const slideUrl = (n) => pathToFileURL(resolve('content/assets', `${script.slides}-${String(n).padStart(2, '0')}.jpg`)).href;
-  const body = frames.map((f) => f.kind === 'base'
-    ? `<section class="f base"><div class="credit">VOICEVOX:${esc(script.speaker_name)}</div><img src="${slideUrl(f.slide)}"></section>`
-    : `<section class="f sub"><div class="band">${esc(f.text)}</div></section>`).join('\n');
+  const body = frames.map((f) => {
+    if (f.kind === 'sub') return `<section class="f sub"><div class="band">${esc(f.text)}</div></section>`;
+    if (f.kind === 'text') return `<section class="f base text"><div class="hook">${esc(f.title)}</div>${f.note ? `<div class="hooknote">${esc(f.note)}</div>` : ''}<div class="credit">VOICEVOX:${esc(script.speaker_name)}</div></section>`;
+    return `<section class="f base"><div class="credit">VOICEVOX:${esc(script.speaker_name)}</div><img src="${slideUrl(f.slide)}"></section>`;
+  }).join('\n');
+
   return `<!doctype html><meta charset="utf-8"><style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { background: transparent; }
-    .f { width: ${W}px; height: ${H}px; position: relative; display: none; font-family: "Noto Sans JP", "Yu Gothic UI", sans-serif; }
+    .f { width: ${W}px; height: ${H}px; position: relative; display: none;
+         font-family: "Noto Sans JP", "Yu Gothic UI", sans-serif; color: #1b1e24; }
     .f.on { display: block; }
     .base { background: #f6f3ec; }
-    .credit { position: absolute; right: 64px; top: 236px; font-size: 26px; font-weight: 700; color: #8a8f99; }
-    .base img { position: absolute; left: 90px; top: 540px; width: 900px; border-radius: 28px;
+    .credit { position: absolute; right: 56px; top: 232px; font-size: 24px; font-weight: 700; color: #9aa0ab; }
+    .base img { position: absolute; left: 30px; top: 330px; width: 1020px; border-radius: 26px;
       box-shadow: 0 16px 48px rgba(27,30,36,.16); }
-    .sub .band { position: absolute; left: 60px; right: 60px; top: 300px; min-height: 250px; white-space: pre-line;
+    .text .hook { position: absolute; left: 60px; right: 60px; top: 480px; text-align: center;
+      font-size: 92px; font-weight: 900; line-height: 1.35; letter-spacing: -.01em; white-space: pre-line; }
+    .text .hooknote { position: absolute; left: 70px; right: 70px; top: 920px; text-align: center;
+      font-size: 40px; font-weight: 700; color: #ff5c35; white-space: pre-line; }
+    .sub .band { position: absolute; left: 40px; right: 40px; bottom: 170px; white-space: pre-line;
       display: flex; align-items: center; justify-content: center; text-align: center;
-      padding: 28px 44px; border-radius: 28px; background: #1b1e24; color: #fff;
-      font-size: 58px; font-weight: 900; line-height: 1.45; letter-spacing: .01em; }
+      padding: 26px 40px; border-radius: 26px; background: rgba(27,30,36,.92); color: #fff;
+      font-size: 58px; font-weight: 900; line-height: 1.35; }
   </style>${body}<script>
     const n = Number(new URLSearchParams(location.search).get('n'));
     document.querySelectorAll('.f')[n - 1].classList.add('on');
@@ -114,15 +122,14 @@ function shoot(html, n, out, transparent) {
 
 // ---------- 組み立て ----------
 
-function ffmpeg(args) {
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
-}
+const ffmpeg = (args) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
 
 async function main() {
-  // 1. フレームの一覧（シーンごとに土台 1 枚 + 字幕 n 枚）
   const frames = [];
   for (const scene of script.scenes) {
-    scene.base = frames.push({ kind: 'base', slide: scene.slide });
+    scene.base = frames.push(scene.kind === 'text'
+      ? { kind: 'text', title: scene.title, note: scene.note }
+      : { kind: 'slide', slide: scene.slide });
     for (const line of scene.lines) line.frame = frames.push({ kind: 'sub', text: line.text });
   }
   const html = join(work, 'frames.html');
@@ -130,7 +137,9 @@ async function main() {
   frames.forEach((f, i) => shoot(html, i + 1, join(work, `f${i + 1}.png`), f.kind === 'sub'));
   console.log(`画像 ${frames.length} 枚を書き出しました`);
 
-  // 2. 音声とシーンごとの動画
+  const chara = script.character ? resolve(dir, '..', script.character.image) : null;
+  if (chara && !existsSync(chara)) throw new Error(`立ち絵が見つかりません: ${chara}`);
+
   const list = [];
   let total = 0;
   for (const [si, scene] of script.scenes.entries()) {
@@ -153,15 +162,31 @@ async function main() {
     const n = Math.round(t * FPS);
     const inputs = ['-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${scene.base}.png`)];
     for (const c of cues) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${c.frame}.png`));
+    if (chara) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', chara);
     inputs.push('-i', audio);
 
     // 2 倍に拡大してからズームすると、揺れ（ジッター）が目立たない
-    let filter = `[0:v]scale=${W * 2}:${H * 2},zoompan=z='1+0.04*on/${n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${FPS}[v0]`;
+    let filter = `[0:v]scale=${W * 2}:${H * 2},zoompan=z='1+0.03*on/${n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${FPS}[bg]`;
+    let last = 'bg';
+    // 立ち絵はスライドの上・字幕の下に重ねる（字幕が隠れないように）
+    if (chara) {
+      const idx = cues.length + 1;
+      const { width = 620, bob = 10, x = 'W-w-30', enter = false } = script.character;
+      // 喋っているあいだ、ゆっくり上下に揺れる。最初のシーンでは右から入ってくる
+      const xExpr = enter && si === 0 ? `${x}+max(0\\,420*(1-t/0.45))` : x;
+      filter += `;[${idx}:v]scale=${width}:-1[ch];[${last}][ch]overlay=x='${xExpr}':y='H-h+40+${bob}*sin(2*PI*t*2.1)'[v0]`;
+      last = 'v0';
+    } else {
+      filter += `;[bg]null[v0]`;
+      last = 'v0';
+    }
     cues.forEach((c, i) => {
-      filter += `;[v${i}][${i + 1}:v]overlay=enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})'[v${i + 1}]`;
+      filter += `;[${last}][${i + 1}:v]overlay=enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})'[s${i}]`;
+      last = `s${i}`;
     });
+
     const seg = join(work, `seg${si}.mp4`);
-    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[v${cues.length}]`, '-map', `${cues.length + 1}:a`,
+    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[${last}]`, '-map', `${cues.length + (chara ? 2 : 1)}:a`,
       '-t', t.toFixed(3), '-r', String(FPS), '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-ar', '44100', '-ac', '2', '-b:a', '128k', seg]);
     list.push(`file '${seg.replace(/\\/g, '/')}'`);
@@ -169,7 +194,6 @@ async function main() {
     console.log(`シーン ${si + 1}/${script.scenes.length}（${t.toFixed(1)} 秒）`);
   }
 
-  // 3. つなげる
   const listFile = join(work, 'list.txt');
   writeFileSync(listFile, list.join('\n'));
   mkdirSync('content/assets', { recursive: true });

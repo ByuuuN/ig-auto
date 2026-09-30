@@ -28,3 +28,7 @@ data/
 .claude/
 content/ideas.md
 content/facts.md
+
+# ずんだもんの素材（配布元からダウンロードしたもの。再配布しない）
+content/reels/_shared/zundamon-src/
+content/reels/_shared/zundamon-*.png
