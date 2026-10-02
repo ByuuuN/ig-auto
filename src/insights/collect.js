@@ -1,7 +1,10 @@
 // アカウントと投稿のインサイトを取得する（読み取りのみ）。
 import { get, config } from '../client.js';
 
-const POST_METRICS = ['reach', 'views', 'saved', 'shares', 'total_interactions', 'profile_visits', 'follows'];
+// どの種類の投稿でも取れるもの
+const POST_METRICS = ['reach', 'views', 'saved', 'shares', 'total_interactions'];
+// リールでは使えない（混ぜると 400 になり、数字が一つも取れなくなる）
+const FEED_ONLY_METRICS = ['profile_visits', 'follows'];
 const ACCOUNT_METRICS = ['reach', 'views', 'profile_views', 'accounts_engaged', 'total_interactions', 'website_clicks'];
 
 const unix = (d) => String(Math.floor(d.getTime() / 1000));
@@ -29,14 +32,15 @@ export async function accountTotals(days = 7, now = new Date()) {
 
 export async function recentPosts(limit = 25) {
   const res = await get('me/media', {
-    fields: 'id,timestamp,media_type,permalink,caption,like_count,comments_count',
+    fields: 'id,timestamp,media_type,media_product_type,permalink,caption,like_count,comments_count',
     limit: String(limit),
   });
   const posts = [];
   for (const m of res.data || []) {
     const metrics = {};
+    const wanted = m.media_product_type === 'REELS' ? POST_METRICS : [...POST_METRICS, ...FEED_ONLY_METRICS];
     try {
-      const ins = await get(`${m.id}/insights`, { metric: POST_METRICS.join(',') });
+      const ins = await get(`${m.id}/insights`, { metric: wanted.join(',') });
       for (const d of ins.data || []) metrics[d.name] = d.values?.[0]?.value ?? d.total_value?.value ?? null;
     } catch {
       // 投稿直後など、インサイトがまだ無いことがある
