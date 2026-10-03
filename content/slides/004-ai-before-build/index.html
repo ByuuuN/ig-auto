@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>004 AIにアプリを作らせる前に決める3つ（リール背景用 1080x820 の3枚）</title>
+<link rel="stylesheet" href="../_shared/base.css">
+<style>
+  /* リール専用の横長スライド（1080x820）。書き出し: node scripts/render-slides.js 004-ai-before-build --height 820
+     リールでは左右 65px が UI に隠れるため、左右は 96px 内側（端から 35px 以上）に置く */
+  .slide.reel { height: 820px; padding: 104px 96px 52px; }
+  .reel .top { top: 36px; }
+  .reel .top b { font-size: 26px; color: var(--ink); font-weight: 700; }
+  .reel .top .right { display: flex; gap: 24px; align-items: center; }
+  .reel .kicker { font-size: 46px; font-weight: 900; color: var(--accent); letter-spacing: .04em; line-height: 1.3; margin-bottom: 6px; }
+  .reel h2 { font-size: 88px; line-height: 1.25; margin-bottom: 24px; }
+  /* 見出しの下は、残りの高さいっぱいを使う */
+  .reel .fill { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .reel .fill > .card, .reel .fill > .step { flex: 1; }
+  .reel .list { gap: 24px; }
+  .reel .list .card { font-size: 54px; line-height: 1.3; font-weight: 900; padding: 0 52px; align-items: center; gap: 36px; }
+  .reel .list .card small { font-size: 34px; margin-top: 4px; }
+  .reel .ico { width: 88px; height: 88px; border-radius: 24px; font-size: 50px; }
+  .reel .flow { gap: 0; }
+  .reel .step { font-size: 46px; line-height: 1.3; padding: 0 48px; gap: 36px; }
+  .reel .step .n { width: 88px; height: 88px; font-size: 48px; }
+  .reel .down { font-size: 48px; line-height: 1; padding: 4px 0; }
+  .reel .cta { margin-top: 0; }
+  .reel .cta .card.hot { font-size: 72px; line-height: 1.35; font-weight: 900; padding: 0 56px; display: flex; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- 1. 目的とゴール -->
+<section class="slide reel">
+  <div class="top"><span class="tag">自宅AI開発ログ #04</span><span class="right"><b>@takato.engineer</b><span class="page"></span></span></div>
+  <div class="kicker">決めること ①</div>
+  <h2><span class="mark">目的と<br>ゴールを決める</span></h2>
+  <div class="fill list">
+    <div class="card"><span class="ico">目</span><div>何を作るか<small>目的</small></div></div>
+    <div class="card"><span class="ico">終</span><div>どこまでで完成か<small>ゴール</small></div></div>
+  </div>
+</section>
+
+<!-- 2. 欲しい機能 -->
+<section class="slide reel">
+  <div class="top"><span class="tag">自宅AI開発ログ #04</span><span class="right"><b>@takato.engineer</b><span class="page"></span></span></div>
+  <div class="kicker">決めること ②</div>
+  <h2><span class="mark">欲しい機能は<br>自分の言葉で書く</span></h2>
+  <div class="fill flow">
+    <div class="step"><span class="n">1</span><div>自分の言葉で書き出す</div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="n">2</span><div>困りそうな所は<br>AIに指摘してもらう</div></div>
+  </div>
+</section>
+
+<!-- 3. 妥協しない -->
+<section class="slide reel">
+  <div class="top"><span class="tag">自宅AI開発ログ #04</span><span class="right"><b>@takato.engineer</b><span class="page"></span></span></div>
+  <div class="kicker">決めること ③</div>
+  <h2><span class="mark">自分で書かない<br>からこそ妥協しない</span></h2>
+  <div class="fill cta">
+    <div class="card hot">使いにくかったら<br>何度でも直す</div>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  slides.forEach((el, i) => { const pg = el.querySelector('.page'); if (pg) pg.textContent = `${i + 1}/${slides.length}`; });
+  const q = new URLSearchParams(location.search);
+  if (q.get('theme')) document.body.dataset.theme = q.get('theme');
+  const n = Number(q.get('n'));
+  if (n) {
+    document.body.classList.add('single');
+    slides[n - 1]?.classList.add('on');
+  }
+</script>
+</body>
+</html>

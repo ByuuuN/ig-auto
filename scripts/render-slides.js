@@ -5,6 +5,8 @@
 //
 // → content/assets/001-autoscribe-01.jpg, -02.jpg, ...
 //   --theme  配色を切り替えて書き出す（比較用。既定は HTML に書かれた配色）
+//   --height 高さを変える（既定 1350）。リールの背景に使うスライドは、
+//            縦長画面の安全地帯に収めるため 820 などの横長にする
 //   --only   指定した番号のスライドだけ書き出す
 //   --out    書き出し先（既定は content/assets）
 // Chrome のヘッドレス機能で PNG を撮り、PowerShell（System.Drawing）で JPEG に変換する。
@@ -15,7 +17,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const WIDTH = 1080;
-const HEIGHT = 1350;
+const DEFAULT_HEIGHT = 1350;
 const QUALITY = 92;
 
 const CHROME = process.env.CHROME_PATH ||
@@ -30,6 +32,7 @@ const opt = (name) => {
   return i >= 0 ? rest[i + 1] : null;
 };
 const theme = opt('theme');
+const HEIGHT = Number(opt('height')) || DEFAULT_HEIGHT;
 const outDir = resolve(opt('out') || 'content/assets');
 const only = opt('only') ? new Set(opt('only').split(',').map(Number)) : null;
 

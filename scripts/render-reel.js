@@ -94,17 +94,19 @@ function framesHtml(frames) {
          font-family: "Noto Sans JP", "Yu Gothic UI", sans-serif; color: #1b1e24; }
     .f.on { display: block; }
     .base { background: #f6f3ec; }
-    .credit { position: absolute; right: 56px; top: 232px; font-size: 24px; font-weight: 700; color: #9aa0ab; }
-    .base img { position: absolute; left: 30px; top: 330px; width: 1020px; border-radius: 26px;
+    /* Instagram のリールは上 270px・下 670px・左右 65px が UI（キャプションやボタン）に隠れる。
+       読ませたいものは y=270～1250 のあいだに置く。立ち絵は左下に立たせる（右下はボタンが並ぶ）。 */
+    .credit { position: absolute; right: 60px; top: 175px; font-size: 24px; font-weight: 700; color: #9aa0ab; }
+    .base img { position: absolute; left: 30px; top: 250px; width: 1020px; border-radius: 26px;
       box-shadow: 0 16px 48px rgba(27,30,36,.16); }
-    .text .hook { position: absolute; left: 60px; right: 60px; top: 480px; text-align: center;
+    .text .hook { position: absolute; left: 60px; right: 60px; top: 380px; text-align: center;
       font-size: 92px; font-weight: 900; line-height: 1.35; letter-spacing: -.01em; white-space: pre-line; }
-    .text .hooknote { position: absolute; left: 70px; right: 70px; top: 920px; text-align: center;
+    .text .hooknote { position: absolute; left: 70px; right: 70px; top: 860px; text-align: center;
       font-size: 40px; font-weight: 700; color: #ff5c35; white-space: pre-line; }
-    .sub .band { position: absolute; left: 40px; right: 40px; bottom: 170px; white-space: pre-line;
+    .sub .band { position: absolute; left: 65px; right: 65px; top: 1040px; white-space: pre-line;
       display: flex; align-items: center; justify-content: center; text-align: center;
-      padding: 26px 40px; border-radius: 26px; background: rgba(27,30,36,.92); color: #fff;
-      font-size: 58px; font-weight: 900; line-height: 1.35; }
+      padding: 22px 40px; border-radius: 26px; background: rgba(27,30,36,.92); color: #fff;
+      font-size: 54px; font-weight: 900; line-height: 1.35; }
   </style>${body}<script>
     const n = Number(new URLSearchParams(location.search).get('n'));
     document.querySelectorAll('.f')[n - 1].classList.add('on');
@@ -171,9 +173,11 @@ async function main() {
     // 立ち絵はスライドの上・字幕の下に重ねる（字幕が隠れないように）
     if (chara) {
       const idx = cues.length + 1;
-      const { width = 620, bob = 10, x = 'W-w-30', enter = false } = script.character;
-      // 喋っているあいだ、ゆっくり上下に揺れる。最初のシーンでは右から入ってくる
-      const xExpr = enter && si === 0 ? `${x}+max(0\\,420*(1-t/0.45))` : x;
+      const { width = 620, bob = 10, x = '-90', enter = false } = script.character;
+      // 喋っているあいだ、ゆっくり上下に揺れる。最初のシーンでは画面の外から入ってくる
+      // （enter: 'left' なら左から、true なら右から）
+      const sign = enter === 'left' ? '-' : '+';
+      const xExpr = enter && si === 0 ? `${x}${sign}max(0\\,420*(1-t/0.45))` : x;
       filter += `;[${idx}:v]scale=${width}:-1[ch];[${last}][ch]overlay=x='${xExpr}':y='H-h+40+${bob}*sin(2*PI*t*2.1)'[v0]`;
       last = 'v0';
     } else {
