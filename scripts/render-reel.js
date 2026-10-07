@@ -4,8 +4,12 @@
 //   node scripts/render-reel.js 002-autoscribe-hallucination
 //
 // 入力: content/reels/<name>/script.json（台本）
-//   scenes[].kind = "text"  … 大きな文字だけのシーン（冒頭のフック向け）
-//   scenes[].kind = "slide" … content/assets/<slides>-NN.jpg を見せるシーン
+//   scenes[].kind = "text"     … 大きな文字だけのシーン（冒頭のフック向け）
+//   scenes[].kind = "slide"    … content/assets/<slides>-NN.jpg を見せるシーン
+//   scenes[].kind = "terminal" … 黒い画面にコマンドと返事が順に出てくるシーン
+//     title … 画面の上に出す名前（既定は Claude Code）
+//     steps … [{ type: "cmd" | "out" | "ok", text: "…", at: 秒 }]
+//             at を書かなければシーンの長さを等分して順に出す
 //   character     … 立ち絵の画像。喋っているあいだ、ゆっくり上下に揺れる
 // 出力: content/assets/<id>.mp4
 import { execFileSync } from 'node:child_process';
@@ -80,11 +84,20 @@ const seconds = (fmt, pcm) => pcm.length / (fmt.rate * fmt.channels * 2);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const slideUrl = (n) => pathToFileURL(resolve('content/assets', `${script.slides}-${String(n).padStart(2, '0')}.jpg`)).href;
 
+const credit = () => `<div class="credit">VOICEVOX:${esc(script.speaker_name)}</div>`;
+
 function framesHtml(frames) {
   const body = frames.map((f) => {
     if (f.kind === 'sub') return `<section class="f sub"><div class="band">${esc(f.text)}</div></section>`;
-    if (f.kind === 'text') return `<section class="f base text"><div class="hook">${esc(f.title)}</div>${f.note ? `<div class="hooknote">${esc(f.note)}</div>` : ''}<div class="credit">VOICEVOX:${esc(script.speaker_name)}</div></section>`;
-    return `<section class="f base"><div class="credit">VOICEVOX:${esc(script.speaker_name)}</div><img src="${slideUrl(f.slide)}"></section>`;
+    if (f.kind === 'text') return `<section class="f base text"><div class="hook">${esc(f.title)}</div>${f.note ? `<div class="hooknote">${esc(f.note)}</div>` : ''}${credit()}</section>`;
+    if (f.kind === 'bg') return `<section class="f base">${credit()}</section>`;
+    if (f.kind === 'term') {
+      const lines = f.steps.map((s) =>
+        `<div class="ln ${s.type || 'out'}">${s.type === 'cmd' ? '<b>&gt;</b> ' : ''}${esc(s.text)}</div>`).join('');
+      return `<section class="f term"><div class="win"><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><span>${esc(f.title)}</span></div>` +
+        `<div class="body">${lines}<div class="ln caret">▌</div></div></div></section>`;
+    }
+    return `<section class="f base">${credit()}<img src="${slideUrl(f.slide)}"></section>`;
   }).join('\n');
 
   return `<!doctype html><meta charset="utf-8"><style>
@@ -103,6 +116,23 @@ function framesHtml(frames) {
       font-size: 92px; font-weight: 900; line-height: 1.35; letter-spacing: -.01em; white-space: pre-line; }
     .text .hooknote { position: absolute; left: 70px; right: 70px; top: 860px; text-align: center;
       font-size: 40px; font-weight: 700; color: #ff5c35; white-space: pre-line; }
+    /* コマンドを打っている画面。スライドと同じ場所に置く */
+    .term { background: transparent; }
+    .term .win { position: absolute; left: 30px; top: 250px; width: 1020px; height: 775px;
+      background: #15181d; border-radius: 26px; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(27,30,36,.28);
+      font-family: "Consolas", "BIZ UDGothic", "MS Gothic", monospace; }
+    .term .bar { height: 76px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
+      background: #22262d; color: #9aa0ab; font-size: 26px; font-weight: 700; }
+    .term .bar i { width: 18px; height: 18px; border-radius: 50%; }
+    .term .bar .r { background: #ff5f57; } .term .bar .y { background: #febc2e; } .term .bar .g { background: #28c840; }
+    .term .bar span { margin-left: 14px; }
+    .term .body { padding: 28px 34px; font-size: 34px; line-height: 1.6; color: #d7dbe2; }
+    .term .ln { margin-bottom: 10px; word-break: break-all; }
+    .term .ln.cmd { color: #fff; font-weight: 700; }
+    .term .ln.cmd b { color: #ff7a4f; }
+    .term .ln.ok { color: #6ee7a0; }
+    .term .caret { color: #ff7a4f; margin-top: -4px; }
     .sub .band { position: absolute; left: 65px; right: 65px; top: 1040px; white-space: pre-line;
       display: flex; align-items: center; justify-content: center; text-align: center;
       padding: 22px 40px; border-radius: 26px; background: rgba(27,30,36,.92); color: #fff;
@@ -176,14 +206,21 @@ const ffmpeg = (args) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...
 async function main() {
   const frames = [];
   for (const scene of script.scenes) {
-    scene.base = frames.push(scene.kind === 'text'
-      ? { kind: 'text', title: scene.title, note: scene.note }
-      : { kind: 'slide', slide: scene.slide });
+    if (scene.kind === 'terminal') {
+      // 背景は 1 枚。その上に「ここまで打った」画面を段階ごとに重ねる
+      scene.base = frames.push({ kind: 'bg' });
+      scene.stepFrames = scene.steps.map((_, i) =>
+        frames.push({ kind: 'term', title: scene.title || 'Claude Code', steps: scene.steps.slice(0, i + 1) }));
+    } else {
+      scene.base = frames.push(scene.kind === 'text'
+        ? { kind: 'text', title: scene.title, note: scene.note }
+        : { kind: 'slide', slide: scene.slide });
+    }
     for (const line of scene.lines) line.frame = frames.push({ kind: 'sub', text: line.text });
   }
   const html = join(work, 'frames.html');
   writeFileSync(html, framesHtml(frames));
-  frames.forEach((f, i) => shoot(html, i + 1, join(work, `f${i + 1}.png`), f.kind === 'sub'));
+  frames.forEach((f, i) => shoot(html, i + 1, join(work, `f${i + 1}.png`), f.kind === 'sub' || f.kind === 'term'));
   console.log(`画像 ${frames.length} 枚を書き出しました`);
 
   // 立ち絵。body・mouth・eye を指定すると口パクとまばたきが付く。image だけなら 1 枚絵のまま
@@ -219,8 +256,14 @@ async function main() {
     const pcm = Buffer.concat(parts);
     writeWav(audio, fmt, pcm);
 
+    // コマンド画面の段階。at を書いていなければシーンの長さを等分する
+    const steps = scene.steps || [];
+    const stepAt = (i) => (i >= steps.length ? t : steps[i].at ?? (t * i) / steps.length);
+    const terms = (scene.stepFrames || []).map((frame, i) => ({ frame, start: stepAt(i), end: stepAt(i + 1) }));
+
     const n = Math.round(t * FPS);
     const inputs = ['-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${scene.base}.png`)];
+    for (const tm of terms) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${tm.frame}.png`));
     for (const c of cues) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${c.frame}.png`));
     for (const f of charaFiles) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', f);
     inputs.push('-i', audio);
@@ -228,9 +271,14 @@ async function main() {
     // 2 倍に拡大してからズームすると、揺れ（ジッター）が目立たない
     let filter = `[0:v]scale=${W * 2}:${H * 2},zoompan=z='1+0.03*on/${n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${FPS}[bg]`;
     let last = 'bg';
+    // コマンド画面は背景のすぐ上。立ち絵と字幕はその上に乗る
+    terms.forEach((tm, i) => {
+      filter += `;[${last}][${i + 1}:v]overlay=enable='between(t,${tm.start.toFixed(3)},${tm.end.toFixed(3)})'[t${i}]`;
+      last = `t${i}`;
+    });
     // 立ち絵はスライドの上・字幕の下に重ねる（字幕が隠れないように）
     if (chara) {
-      const base = cues.length + 1;
+      const base = terms.length + cues.length + 1;
       const { width = 620, bob = 10, x = '-90', enter = false } = C;
       // 喋っているあいだ、ゆっくり上下に揺れる。最初のシーンでは画面の外から入ってくる
       // （enter: 'left' なら左から、true なら右から）
@@ -260,16 +308,16 @@ async function main() {
         if (blink) put(eye + 1, blink);
       }
     } else {
-      filter += `;[bg]null[v0]`;
+      filter += `;[${last}]null[v0]`;
       last = 'v0';
     }
     cues.forEach((c, i) => {
-      filter += `;[${last}][${i + 1}:v]overlay=enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})'[s${i}]`;
+      filter += `;[${last}][${terms.length + i + 1}:v]overlay=enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})'[s${i}]`;
       last = `s${i}`;
     });
 
     const seg = join(work, `seg${si}.mp4`);
-    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[${last}]`, '-map', `${cues.length + charaFiles.length + 1}:a`,
+    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[${last}]`, '-map', `${terms.length + cues.length + charaFiles.length + 1}:a`,
       '-t', t.toFixed(3), '-r', String(FPS), '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-ar', '44100', '-ac', '2', '-b:a', '128k', seg]);
     list.push(`file '${seg.replace(/\\/g, '/')}'`);
