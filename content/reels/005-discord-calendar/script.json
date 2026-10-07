@@ -1,0 +1,101 @@
+{
+  "id": "005-discord-calendar",
+  "slides": "005-discord-calendar",
+  "speaker": 3,
+  "speaker_name": "ずんだもん",
+  "speed": 1.2,
+  "character": {
+    "body": "_shared/zundamon-body.png",
+    "mouth": [
+      "_shared/zundamon-mouth-0.png",
+      "_shared/zundamon-mouth-1.png",
+      "_shared/zundamon-mouth-2.png"
+    ],
+    "eye": [
+      "_shared/zundamon-eye-0.png",
+      "_shared/zundamon-eye-1.png"
+    ],
+    "width": 500,
+    "bob": 10,
+    "x": "20",
+    "enter": "left"
+  },
+  "scenes": [
+    {
+      "kind": "text",
+      "title": "診察券の\n次回予約、\nどうしてるのだ？",
+      "note": "A 手で入力　B そもそも入れてない",
+      "lines": [
+        {
+          "text": "診察券の次回予約、\nカレンダーに",
+          "yomi": "診察券の次回予約、カレンダーに、"
+        },
+        {
+          "text": "どう入れてるのだ？",
+          "yomi": "どう入れてるのだ？"
+        },
+        {
+          "text": "手で入力か、\nそもそも入れてないか、なのだ",
+          "yomi": "手で入力か、そもそも入れてないか、なのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 1,
+      "lines": [
+        {
+          "text": "Gmailに来る予約メールは、\n自動で入るのだ",
+          "yomi": "ジーメールに来る予約メールは、自動で入るのだ。"
+        },
+        {
+          "text": "でも手書きの紙は、\n自分で打つしかなかったのだ",
+          "yomi": "でも手書きの紙は、自分で打つしかなかったのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 2,
+      "lines": [
+        {
+          "text": "写真を送ると、\nAIが日時を読み取るのだ",
+          "yomi": "写真を送ると、エーアイが日時を読み取るのだ。"
+        },
+        {
+          "text": "確認してボタンを\n押すだけなのだ",
+          "yomi": "確認してボタンを押すだけなのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 3,
+      "lines": [
+        {
+          "text": "下調べが30分、\nAIに投げて1時間なのだ",
+          "yomi": "下調べがさんじゅっぷん、エーアイに投げて、いちじかんなのだ。"
+        },
+        {
+          "text": "画像はAIに送られるから、\n見られて困るものは送らないのだ",
+          "yomi": "画像はエーアイに送られるから、見られて困るものは送らないのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "AとB、\nどっち？",
+      "note": "コメントで教えてほしいのだ",
+      "lines": [
+        {
+          "text": "AとB、どっちなのだ？",
+          "yomi": "エーとビー、どっちなのだ？"
+        },
+        {
+          "text": "コメントで教えてほしいのだ",
+          "yomi": "コメントで教えてほしいのだ。"
+        }
+      ]
+    }
+  ]
+}

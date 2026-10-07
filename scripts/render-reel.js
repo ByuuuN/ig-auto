@@ -122,6 +122,53 @@ function shoot(html, n, out, transparent) {
   if (!existsSync(out)) throw new Error(`画像の書き出しに失敗: ${out}`);
 }
 
+// ---------- 口パク・まばたき ----------
+
+const STEP = 0.09; // 口の形を決める間隔（秒）
+
+// 声の大きさから、口の形（0=閉じ 1=半開き 2=開き）を STEP ごとに決める
+function mouthLevels(fmt, pcm) {
+  const frame = Math.round(STEP * fmt.rate) * fmt.channels;
+  const count = Math.floor(pcm.length / 2 / frame);
+  const rms = [];
+  for (let i = 0; i < count; i++) {
+    let sum = 0;
+    for (let j = 0; j < frame; j++) {
+      const v = pcm.readInt16LE((i * frame + j) * 2);
+      sum += v * v;
+    }
+    rms.push(Math.sqrt(sum / frame));
+  }
+  const peak = Math.max(...rms, 1);
+  return rms.map((v) => (v < peak * 0.1 ? 0 : v < peak * 0.32 ? 1 : 2));
+}
+
+// 同じ形が続くところをまとめて [開始秒, 終了秒] の配列にする
+function levelRanges(levels, level) {
+  const out = [];
+  let from = null;
+  levels.forEach((v, i) => {
+    if (v === level && from === null) from = i;
+    if (v !== level && from !== null) {
+      out.push([from * STEP, i * STEP]);
+      from = null;
+    }
+  });
+  if (from !== null) out.push([from * STEP, levels.length * STEP]);
+  return out;
+}
+
+// 2〜4 秒おきに 0.12 秒だけ目を閉じる。間隔は固定なので、何度書き出しても同じ動きになる
+function blinkRanges(total) {
+  const gaps = [2.7, 3.4, 2.2, 4.1];
+  const out = [];
+  for (let i = 0, t = 1.1; t < total - 0.2; t += gaps[i % gaps.length], i++) out.push([t, t + 0.12]);
+  return out;
+}
+
+const rangeExpr = (ranges) =>
+  ranges.length ? ranges.map(([a, b]) => `between(t,${a.toFixed(2)},${b.toFixed(2)})`).join('+') : null;
+
 // ---------- 組み立て ----------
 
 const ffmpeg = (args) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
@@ -139,8 +186,18 @@ async function main() {
   frames.forEach((f, i) => shoot(html, i + 1, join(work, `f${i + 1}.png`), f.kind === 'sub'));
   console.log(`画像 ${frames.length} 枚を書き出しました`);
 
-  const chara = script.character ? resolve(dir, '..', script.character.image) : null;
-  if (chara && !existsSync(chara)) throw new Error(`立ち絵が見つかりません: ${chara}`);
+  // 立ち絵。body・mouth・eye を指定すると口パクとまばたきが付く。image だけなら 1 枚絵のまま
+  const charaFile = (p) => {
+    const f = resolve(dir, '..', p);
+    if (!existsSync(f)) throw new Error(`立ち絵が見つかりません: ${f}`);
+    return f;
+  };
+  const C = script.character;
+  const chara = !C ? null
+    : C.body
+      ? { body: charaFile(C.body), mouth: (C.mouth || []).map(charaFile), eye: (C.eye || []).map(charaFile) }
+      : { body: charaFile(C.image), mouth: [], eye: [] };
+  const charaFiles = chara ? [chara.body, ...chara.mouth, ...chara.eye] : [];
 
   const list = [];
   let total = 0;
@@ -159,12 +216,13 @@ async function main() {
       t += dur + gap;
     }
     const audio = join(work, `s${si}.wav`);
-    writeWav(audio, fmt, Buffer.concat(parts));
+    const pcm = Buffer.concat(parts);
+    writeWav(audio, fmt, pcm);
 
     const n = Math.round(t * FPS);
     const inputs = ['-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${scene.base}.png`)];
     for (const c of cues) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', join(work, `f${c.frame}.png`));
-    if (chara) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', chara);
+    for (const f of charaFiles) inputs.push('-framerate', String(FPS), '-loop', '1', '-t', t.toFixed(3), '-i', f);
     inputs.push('-i', audio);
 
     // 2 倍に拡大してからズームすると、揺れ（ジッター）が目立たない
@@ -172,14 +230,35 @@ async function main() {
     let last = 'bg';
     // 立ち絵はスライドの上・字幕の下に重ねる（字幕が隠れないように）
     if (chara) {
-      const idx = cues.length + 1;
-      const { width = 620, bob = 10, x = '-90', enter = false } = script.character;
+      const base = cues.length + 1;
+      const { width = 620, bob = 10, x = '-90', enter = false } = C;
       // 喋っているあいだ、ゆっくり上下に揺れる。最初のシーンでは画面の外から入ってくる
       // （enter: 'left' なら左から、true なら右から）
       const sign = enter === 'left' ? '-' : '+';
       const xExpr = enter && si === 0 ? `${x}${sign}max(0\\,420*(1-t/0.45))` : x;
-      filter += `;[${idx}:v]scale=${width}:-1[ch];[${last}][ch]overlay=x='${xExpr}':y='H-h+40+${bob}*sin(2*PI*t*2.1)'[v0]`;
-      last = 'v0';
+      const yExpr = `H-h+40+${bob}*sin(2*PI*t*2.1)`;
+      // 土台・口・目を同じ位置に重ねる。enable で出す区間を切り替える
+      let k = 0;
+      const put = (idx, enable) => {
+        const out = `v${k++}`;
+        filter += `;[${idx}:v]scale=${width}:-1[p${idx}]`;
+        filter += `;[${last}][p${idx}]overlay=x='${xExpr}':y='${yExpr}'${enable ? `:enable='${enable}'` : ''}[${out}]`;
+        last = out;
+      };
+      put(base);
+      if (chara.mouth.length) {
+        const levels = mouthLevels(fmt, pcm);
+        chara.mouth.forEach((_, i) => {
+          const e = rangeExpr(levelRanges(levels, i));
+          if (e) put(base + 1 + i, e);
+        });
+      }
+      if (chara.eye.length === 2) {
+        const blink = rangeExpr(blinkRanges(t));
+        const eye = base + 1 + chara.mouth.length;
+        put(eye, blink && `not(${blink})`);
+        if (blink) put(eye + 1, blink);
+      }
     } else {
       filter += `;[bg]null[v0]`;
       last = 'v0';
@@ -190,7 +269,7 @@ async function main() {
     });
 
     const seg = join(work, `seg${si}.mp4`);
-    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[${last}]`, '-map', `${cues.length + (chara ? 2 : 1)}:a`,
+    ffmpeg([...inputs, '-filter_complex', filter, '-map', `[${last}]`, '-map', `${cues.length + charaFiles.length + 1}:a`,
       '-t', t.toFixed(3), '-r', String(FPS), '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-ar', '44100', '-ac', '2', '-b:a', '128k', seg]);
     list.push(`file '${seg.replace(/\\/g, '/')}'`);
