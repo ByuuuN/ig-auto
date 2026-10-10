@@ -1,7 +1,7 @@
 {
   "id": "005-discord-calendar",
   "type": "reel",
-  "status": "ready",
+  "status": "published",
   "scheduled_for": "2026-10-10T21:00:00+09:00",
   "video": "005-discord-calendar.mp4",
   "caption": "診察券の次回予約、Google カレンダーにどう入れていますか？私は、手で入力するのが面倒で、写真を送るだけで登録される仕組みを作りました。\n\n▼先に注意\n画像は AI（Gemini）に送られます。無料枠では、送った画像が Google のサービス改善に使われます。\n人に見られて困る内容は送らないでください。私は会社の予定は入れず、個人の予定だけにしています。\n\n▼仕組み\n・Discord に、予定が書かれた写真やスクショを送る\n・AI（Gemini）が日時などを読み取る\n・確認ボタンを押すと、Google カレンダーに登録される\n\n▼動画では話せなかった細かい工夫\n・年が書かれていなければ、今年として扱う（今日より前の日付なら来年）\n・終了時刻が書かれていなければ、開始の 1 時間後で登録。時刻そのものが無ければ終日の予定にする\n・持ち物・予約番号などは、メモ欄に箇条書きで入る\n\n▼かかった手間\n下調べに 30 分、Claude Code に投げて 1 時間ほど。費用は 0 円です（読み取りは Gemini API の無料枠。常時起動は自宅の PC）。これまで通院と美容室の予約を 4 件ほど登録して、手書きでも今のところ問題なく読み取れています。\n\nあなたはどちらですか？\nA 手で入力している\nB そもそも入れていない\nコメントで教えてください。\n\nAutoScribe など、実際に作ったものの作り方は note にまとめる予定です。有料記事になる見込みです。\n\n本業はインフラエンジニア。コードは自分では書かず、AI に書かせています。\n\nナレーション：VOICEVOX:ずんだもん／立ち絵：坂本アヒル",
@@ -15,5 +15,7 @@
     "自動化",
     "ずんだもん"
   ],
-  "source_note": "content/reels/005-discord-calendar/script.json（台本）。事実は facts.md の「Discord → Google カレンダー登録 bot（2026-10-07 社長回答）」と、discord-calendar-bot の README.md（読み取りの補完ルール・Gemini 無料枠・自宅 PC での常時起動）"
+  "source_note": "content/reels/005-discord-calendar/script.json（台本）。事実は facts.md の「Discord → Google カレンダー登録 bot（2026-10-07 社長回答）」と、discord-calendar-bot の README.md（読み取りの補完ルール・Gemini 無料枠・自宅 PC での常時起動）",
+  "media_id": "17913853959464584",
+  "published_at": "2026-10-10T12:03:10.430Z"
 }
