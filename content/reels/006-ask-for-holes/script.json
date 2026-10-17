@@ -1,0 +1,123 @@
+{
+  "id": "006-ask-for-holes",
+  "slides": "006-ask-for-holes",
+  "speaker": 3,
+  "speaker_name": "ずんだもん",
+  "speed": 1.2,
+  "character": {
+    "body": "_shared/zundamon-body.png",
+    "mouth": [
+      "_shared/zundamon-mouth-0.png",
+      "_shared/zundamon-mouth-1.png",
+      "_shared/zundamon-mouth-2.png"
+    ],
+    "eye": [
+      "_shared/zundamon-eye-0.png",
+      "_shared/zundamon-eye-1.png"
+    ],
+    "width": 500,
+    "bob": 10,
+    "x": "20",
+    "enter": "left"
+  },
+  "scenes": [
+    {
+      "kind": "text",
+      "title": "AIに最初に\n頼むのは\nコードじゃない",
+      "note": "頼むのは「穴探し」",
+      "lines": [
+        {
+          "text": "AIに最初に頼むのは、\nコードじゃないのだ",
+          "yomi": "エーアイに最初に頼むのは、コードじゃないのだ。"
+        },
+        {
+          "text": "頼むのは、穴探しなのだ",
+          "yomi": "頼むのは、あなさがしなのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "terminal",
+      "title": "Claude Code （再現イメージ）",
+      "steps": [
+        {
+          "type": "cmd",
+          "text": "文字起こしツールを作りたい"
+        },
+        {
+          "type": "cmd",
+          "text": "作るときに障害になりそうな所を教えて"
+        },
+        {
+          "type": "out",
+          "text": "3点あります。"
+        },
+        {
+          "type": "ok",
+          "text": "1. コピー中のファイルは途中までしか読めない"
+        },
+        {
+          "type": "ok",
+          "text": "2. 無音で決まり文句を作ってしまう"
+        },
+        {
+          "type": "ok",
+          "text": "3. Windowsだと日本語が文字化けする"
+        }
+      ],
+      "lines": [
+        {
+          "text": "欲しい機能を書いて、\n障害になりそうな所を聞くのだ",
+          "yomi": "欲しい機能を書いて、障害になりそうな所を聞くのだ。"
+        },
+        {
+          "text": "そうすると、作る前に\n穴が出てくるのだ",
+          "yomi": "そうすると、作る前に、あなが出てくるのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 1,
+      "lines": [
+        {
+          "text": "コピーの途中で読み始めると、\n途中までしか文字にならないのだ",
+          "yomi": "コピーの途中で読み始めると、\n途中までしか文字にならないのだ"
+        },
+        {
+          "text": "知っていれば、対策を\n書いておけるのだ",
+          "yomi": "知っていれば、対策を書いておけるのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 2,
+      "lines": [
+        {
+          "text": "先に聞いて、仕様書に\n書いてから作らせるのだ",
+          "yomi": "先に聞いて、仕様書に\n書いてから作らせるのだ"
+        },
+        {
+          "text": "1日目は仕様書、\n2日目に作ったのだ",
+          "yomi": "いちにちめは仕様書、ふつかめに作ったのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "AIは\n作る前にも\n使える",
+      "note": "本業はインフラエンジニア",
+      "lines": [
+        {
+          "text": "AIは、作る前にも\n使えるのだ",
+          "yomi": "エーアイは、作る前にも使えるのだ。"
+        },
+        {
+          "text": "作り方の解説は、\nnoteにまとめる予定なのだ",
+          "yomi": "作り方の解説は、ノートにまとめる予定なのだ。"
+        }
+      ]
+    }
+  ]
+}
