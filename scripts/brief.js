@@ -57,7 +57,8 @@ async function numbers() {
 
   const posts = await recentPosts(3);
   for (const p of posts) {
-    console.log(`- ${jst(p.posted_at)} ${p.title.slice(0, 24)}… リーチ ${p.reach ?? '-'} / 保存 ${p.saved ?? '-'} / いいね ${p.likes} / コメント ${p.comments}`);
+    const watch = p.avg_watch_sec != null ? ` / 平均視聴 ${p.avg_watch_sec}秒` : '';
+    console.log(`- ${jst(p.posted_at)} ${p.title.slice(0, 24)}… リーチ ${p.reach ?? '-'} / 保存 ${p.saved ?? '-'} / いいね ${p.likes} / コメント ${p.comments}${watch}`);
   }
 }
 

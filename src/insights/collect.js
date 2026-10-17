@@ -5,6 +5,8 @@ import { get, config } from '../client.js';
 const POST_METRICS = ['reach', 'views', 'saved', 'shares', 'total_interactions'];
 // リールでは使えない（混ぜると 400 になり、数字が一つも取れなくなる）
 const FEED_ONLY_METRICS = ['profile_visits', 'follows'];
+// リールだけ。平均視聴時間（ミリ秒）。冒頭で離脱されていないかを見るための数字
+const REEL_ONLY_METRICS = ['ig_reels_avg_watch_time', 'ig_reels_video_view_total_time'];
 const ACCOUNT_METRICS = ['reach', 'views', 'profile_views', 'accounts_engaged', 'total_interactions', 'website_clicks'];
 
 const unix = (d) => String(Math.floor(d.getTime() / 1000));
@@ -38,7 +40,9 @@ export async function recentPosts(limit = 25) {
   const posts = [];
   for (const m of res.data || []) {
     const metrics = {};
-    const wanted = m.media_product_type === 'REELS' ? POST_METRICS : [...POST_METRICS, ...FEED_ONLY_METRICS];
+    const wanted = m.media_product_type === 'REELS'
+      ? [...POST_METRICS, ...REEL_ONLY_METRICS]
+      : [...POST_METRICS, ...FEED_ONLY_METRICS];
     try {
       const ins = await get(`${m.id}/insights`, { metric: wanted.join(',') });
       for (const d of ins.data || []) metrics[d.name] = d.values?.[0]?.value ?? d.total_value?.value ?? null;
@@ -54,6 +58,10 @@ export async function recentPosts(limit = 25) {
       likes: m.like_count ?? null,
       comments: m.comments_count ?? null,
       ...metrics,
+      // 秒に直しておく（API はミリ秒で返す）
+      avg_watch_sec: metrics.ig_reels_avg_watch_time != null
+        ? Math.round(metrics.ig_reels_avg_watch_time / 10) / 100
+        : null,
     });
   }
   return posts;
