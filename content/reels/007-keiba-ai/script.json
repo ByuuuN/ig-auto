@@ -1,0 +1,123 @@
+{
+  "id": "007-keiba-ai",
+  "slides": "007-keiba-ai",
+  "speaker": 3,
+  "speaker_name": "ずんだもん",
+  "speed": 1.2,
+  "character": {
+    "body": "_shared/zundamon-body.png",
+    "mouth": [
+      "_shared/zundamon-mouth-0.png",
+      "_shared/zundamon-mouth-1.png",
+      "_shared/zundamon-mouth-2.png"
+    ],
+    "eye": [
+      "_shared/zundamon-eye-0.png",
+      "_shared/zundamon-eye-1.png"
+    ],
+    "width": 500,
+    "bob": 10,
+    "x": "20",
+    "enter": "left"
+  },
+  "scenes": [
+    {
+      "kind": "text",
+      "title": "AIに競馬予想を\nさせたら\n人気順に負けた",
+      "note": "まだ実用にはなりません",
+      "lines": [
+        {
+          "text": "AIに競馬予想を\nさせてみたのだ",
+          "yomi": "エーアイに競馬予想をさせてみたのだ。"
+        },
+        {
+          "text": "結果は、人気順に\n負けたのだ",
+          "yomi": "結果は、人気順に負けたのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "terminal",
+      "title": "Claude Code （再現イメージ）",
+      "steps": [
+        {
+          "type": "cmd",
+          "text": "過去のレースデータで予想モデルを作って"
+        },
+        {
+          "type": "out",
+          "text": "データを学習させます。"
+        },
+        {
+          "type": "out",
+          "text": "当たりやすさを検証します。"
+        },
+        {
+          "type": "ok",
+          "text": "AIの予想：0.74"
+        },
+        {
+          "type": "out",
+          "text": "人気順：0.83（※0.5 が当てずっぽう）"
+        },
+        {
+          "type": "ok",
+          "text": "人気順のほうが当たります"
+        }
+      ],
+      "lines": [
+        {
+          "text": "過去のレースデータを\n学習させたのだ",
+          "yomi": "過去のレースデータを学習させたのだ。"
+        },
+        {
+          "text": "でも、人気順のほうが\n当たっていたのだ",
+          "yomi": "でも、人気順のほうが当たっていたのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 1,
+      "lines": [
+        {
+          "text": "AIが選んだ馬だけ買うと、\n1万円が6500円なのだ",
+          "yomi": "エーアイが選んだ馬だけ買うと、いちまんえんが、ろくせんごひゃくえんなのだ。"
+        },
+        {
+          "text": "全部買うより\n損したのだ",
+          "yomi": "全部買うより、損したのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 2,
+      "lines": [
+        {
+          "text": "AIが「お得」と思うのは\n人気薄ばかりなのだ",
+          "yomi": "エーアイが、お得と思うのは、人気薄ばかりなのだ。"
+        },
+        {
+          "text": "買った馬の半分以上が\n50倍超だったのだ",
+          "yomi": "買った馬の半分以上が、ごじゅうばいちょうだったのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "まだ実用には\nならない",
+      "note": "続きはまた報告します",
+      "lines": [
+        {
+          "text": "このままでは\n使えないのだ",
+          "yomi": "このままでは使えないのだ。"
+        },
+        {
+          "text": "いま改良中なのだ",
+          "yomi": "いま、改良中なのだ。"
+        }
+      ]
+    }
+  ]
+}
