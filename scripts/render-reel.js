@@ -11,6 +11,9 @@
 //     steps … [{ type: "cmd" | "out" | "ok", text: "…", at: 秒 }]
 //             at を書かなければシーンの長さを等分して順に出す
 //   character     … 立ち絵の画像。喋っているあいだ、ゆっくり上下に揺れる
+//   bgm           … { file, volume }。尺に合わせて繰り返し、前後 1.5 秒で出入りする
+//                   （volume の既定は 0.08。ナレーションを 1 としたときの相対値）
+//                   素材の規約で著作表記が要るものは、本文にクレジットを入れること
 // 出力: content/assets/<id>.mp4
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -82,13 +85,15 @@ const seconds = (fmt, pcm) => pcm.length / (fmt.rate * fmt.channels * 2);
 // ---------- 画像 ----------
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// 字幕の **〜** で囲ったところを目立つ色にする
+const mark = (s) => esc(s).replace(/\*\*([^*]+)\*\*/g, '<em>$1</em>');
 const slideUrl = (n) => pathToFileURL(resolve('content/assets', `${script.slides}-${String(n).padStart(2, '0')}.jpg`)).href;
 
 const credit = () => `<div class="credit">VOICEVOX:${esc(script.speaker_name)}</div>`;
 
 function framesHtml(frames) {
   const body = frames.map((f) => {
-    if (f.kind === 'sub') return `<section class="f sub"><div class="band">${esc(f.text)}</div></section>`;
+    if (f.kind === 'sub') return `<section class="f sub"><div class="band">${mark(f.text)}</div></section>`;
     if (f.kind === 'text') return `<section class="f base text"><div class="hook">${esc(f.title)}</div>${f.note ? `<div class="hooknote">${esc(f.note)}</div>` : ''}${credit()}</section>`;
     if (f.kind === 'bg') return `<section class="f base">${credit()}</section>`;
     if (f.kind === 'term') {
@@ -133,10 +138,12 @@ function framesHtml(frames) {
     .term .ln.cmd b { color: #ff7a4f; }
     .term .ln.ok { color: #6ee7a0; }
     .term .caret { color: #ff7a4f; margin-top: -4px; }
-    .sub .band { position: absolute; left: 65px; right: 65px; top: 1040px; white-space: pre-line;
-      display: flex; align-items: center; justify-content: center; text-align: center;
-      padding: 22px 40px; border-radius: 26px; background: rgba(27,30,36,.92); color: #fff;
-      font-size: 54px; font-weight: 900; line-height: 1.35; }
+    /* 字幕は帯を敷かず、太い縁取りで読ませる。小さい画面でも止まってもらえるよう大きくする */
+    .sub .band { position: absolute; left: 50px; right: 50px; top: 1020px; white-space: pre-line;
+      text-align: center; font-size: 66px; font-weight: 900; line-height: 1.32; color: #fff;
+      -webkit-text-stroke: 16px #15181d; paint-order: stroke fill;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.45)); }
+    .sub .band em { color: #ffd83d; font-style: normal; }
   </style>${body}<script>
     const n = Number(new URLSearchParams(location.search).get('n'));
     document.querySelectorAll('.f')[n - 1].classList.add('on');
@@ -244,7 +251,7 @@ async function main() {
     const cues = [];
     let t = 0;
     for (const [li, line] of scene.lines.entries()) {
-      const wav = parseWav(await tts(line.yomi || line.text.split('\n').join('')));
+      const wav = parseWav(await tts(line.yomi || line.text.replace(/\*\*/g, '').split('\n').join('')));
       fmt = wav;
       const dur = seconds(fmt, wav.pcm);
       const gap = li < scene.lines.length - 1 ? GAP : TAIL;
@@ -329,7 +336,23 @@ async function main() {
   writeFileSync(listFile, list.join('\n'));
   mkdirSync('content/assets', { recursive: true });
   const out = resolve('content/assets', `${script.id}.mp4`);
-  ffmpeg(['-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', '-movflags', '+faststart', out]);
+  const joined = script.bgm ? join(work, 'joined.mp4') : out;
+  ffmpeg(['-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', '-movflags', '+faststart', joined]);
+
+  // BGM はナレーションの邪魔にならない音量で、尺に合わせて繰り返す
+  if (script.bgm) {
+    const file = resolve(dir, '..', script.bgm.file);
+    if (!existsSync(file)) throw new Error(`BGM が見つかりません: ${file}`);
+    const volume = script.bgm.volume ?? 0.08;
+    const fade = 1.5;
+    ffmpeg(['-i', joined, '-stream_loop', '-1', '-i', file,
+      '-filter_complex',
+      `[1:a]volume=${volume},afade=t=in:st=0:d=${fade},afade=t=out:st=${Math.max(0, total - fade).toFixed(2)}:d=${fade}[bg]` +
+      `;[0:a][bg]amix=inputs=2:duration=first:normalize=0[a]`,
+      '-map', '0:v', '-map', '[a]', '-c:v', 'copy',
+      '-c:a', 'aac', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-movflags', '+faststart', out]);
+    console.log(`BGM を重ねました（音量 ${volume}）`);
+  }
   console.log(`\n書き出しました: ${out}（${total.toFixed(1)} 秒）`);
 }
 

@@ -32,3 +32,6 @@ content/facts.md
 # ずんだもんの素材（配布元からダウンロードしたもの。再配布しない）
 content/reels/_shared/zundamon-src/
 content/reels/_shared/zundamon-*.png
+
+# BGM（魔王魂からダウンロードしたもの。曲単品の再配布は規約で禁止されている）
+content/reels/_shared/bgm/
