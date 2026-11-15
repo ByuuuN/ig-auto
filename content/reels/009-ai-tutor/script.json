@@ -1,0 +1,127 @@
+{
+  "id": "009-ai-tutor",
+  "slides": "009-ai-tutor",
+  "speaker": 3,
+  "speaker_name": "ずんだもん",
+  "speed": 1.2,
+  "bgm": {
+    "file": "_shared/bgm/maou_bgm_cyber36.mp3",
+    "volume": 0.08
+  },
+  "character": {
+    "body": "_shared/zundamon-body.png",
+    "mouth": [
+      "_shared/zundamon-mouth-0.png",
+      "_shared/zundamon-mouth-1.png",
+      "_shared/zundamon-mouth-2.png"
+    ],
+    "eye": [
+      "_shared/zundamon-eye-0.png",
+      "_shared/zundamon-eye-1.png"
+    ],
+    "width": 500,
+    "bob": 10,
+    "x": "20",
+    "enter": "left"
+  },
+  "scenes": [
+    {
+      "kind": "text",
+      "title": "AIに勉強を教わったら\n間違えた「理由」まで\n記録された",
+      "note": "Claude Codeを学習に使う",
+      "lines": [
+        {
+          "text": "AIに、資格の勉強を\n教わっているのだ",
+          "yomi": "エーアイに、資格の勉強を、教わっているのだ。"
+        },
+        {
+          "text": "間違えた**理由**まで\n記録されたのだ",
+          "yomi": "間違えた、理由まで、記録されたのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "terminal",
+      "title": "Claude Code （再現イメージ）",
+      "steps": [
+        {
+          "type": "cmd",
+          "text": "1章の一問一答を出して。答えは伏せて"
+        },
+        {
+          "type": "out",
+          "text": "問題をつくりました。"
+        },
+        {
+          "type": "cmd",
+          "text": "（答えたあと）間違えたところを記録して"
+        },
+        {
+          "type": "ok",
+          "text": "間違いログに記録しました"
+        },
+        {
+          "type": "ok",
+          "text": "原因：混同（/dev と /proc の取り違え）"
+        }
+      ],
+      "lines": [
+        {
+          "text": "手元の参考書をもとに、\n**問題**を出してもらうのだ",
+          "yomi": "手元の参考書をもとに、問題を、出してもらうのだ。"
+        },
+        {
+          "text": "間違えたら、記録まで\nお願いするのだ",
+          "yomi": "間違えたら、記録まで、お願いするのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 1,
+      "lines": [
+        {
+          "text": "資格の参考書1冊を\n**20周**するやり方なのだ",
+          "yomi": "資格の参考書いっさつを、にじゅっしゅうするやり方なのだ。"
+        },
+        {
+          "text": "1周目は通読、10周目は\n間違いの**分析**なのだ",
+          "yomi": "いっしゅうめは通読、じゅっしゅうめは間違いの分析なのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 2,
+      "lines": [
+        {
+          "text": "間違いの原因は、\n**4つ**に分けられるのだ",
+          "yomi": "間違いの原因は、よっつに分けられるのだ。"
+        },
+        {
+          "text": "CPU情報のファイルを\n似た名前と**取り違え**たのだ",
+          "yomi": "シーピーユー情報のファイルを、似た名前と取り違えたのだ。"
+        },
+        {
+          "text": "進みはまだ\n少しだけなのだ",
+          "yomi": "進みは、まだ少しだけなのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "Claude Codeは\n作るためだけの\n道具じゃない",
+      "note": "学ぶためにも使えます",
+      "lines": [
+        {
+          "text": "Claude Codeは、作るため\nだけの道具じゃないのだ",
+          "yomi": "クロードコードは、作るためだけの道具じゃないのだ。"
+        },
+        {
+          "text": "自分が**学ぶ**ためにも\n使えるのだ",
+          "yomi": "自分が、学ぶためにも、使えるのだ。"
+        }
+      ]
+    }
+  ]
+}
