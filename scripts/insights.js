@@ -18,7 +18,7 @@ const POSTS_CSV = join(DIR, 'posts.csv');
 const ACCOUNT_COLS = ['recorded_at', 'followers', 'following', 'posts',
   'reach_7d', 'views_7d', 'profile_views_7d', 'accounts_engaged_7d', 'interactions_7d', 'website_clicks_7d', 'new_follows_7d'];
 const POST_COLS = ['recorded_at', 'posted_at', 'title', 'type', 'reach', 'views', 'likes', 'comments',
-  'saved', 'shares', 'total_interactions', 'profile_visits', 'follows', 'permalink', 'id'];
+  'saved', 'shares', 'total_interactions', 'profile_visits', 'follows', 'avg_watch_sec', 'permalink', 'id'];
 
 const jst = (d) => new Date(d).toLocaleString('sv-SE', { timeZone: 'Asia/Tokyo' }).slice(0, 16);
 const cell = (v) => {
@@ -79,7 +79,8 @@ async function main() {
   console.log('投稿ごと（新しい順）');
   for (const p of posts) {
     const rate = p.reach ? ` 保存率 ${((p.saved / p.reach) * 100).toFixed(1)}%` : '';
-    console.log(`  ${jst(p.posted_at)}  リーチ ${p.reach ?? '-'} / 保存 ${p.saved ?? '-'} / いいね ${p.likes} / コメント ${p.comments} / フォロー ${p.follows ?? '-'}${rate}`);
+    const watch = p.avg_watch_sec != null ? ` / 平均視聴 ${p.avg_watch_sec}秒` : '';
+    console.log(`  ${jst(p.posted_at)}  リーチ ${p.reach ?? '-'} / 保存 ${p.saved ?? '-'} / いいね ${p.likes} / コメント ${p.comments} / フォロー ${p.follows ?? '-'}${watch}${rate}`);
     console.log(`    ${p.title}`);
   }
 }
