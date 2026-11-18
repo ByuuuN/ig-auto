@@ -10,6 +10,7 @@
 //     title … 画面の上に出す名前（既定は Claude Code）
 //     steps … [{ type: "cmd" | "out" | "ok", text: "…", at: 秒 }]
 //             at を書かなければシーンの長さを等分して順に出す
+//   scenes[].mouthClosed = true … そのシーンだけ口を閉じたままにする（口パクとの見比べ用）
 //   character     … 立ち絵の画像。喋っているあいだ、ゆっくり上下に揺れる
 //   bgm           … { file, volume }。尺に合わせて繰り返し、前後 1.5 秒で出入りする
 //                   （volume の既定は 0.08。ナレーションを 1 としたときの相対値）
@@ -302,7 +303,7 @@ async function main() {
       };
       put(base);
       if (chara.mouth.length) {
-        const levels = mouthLevels(fmt, pcm);
+        const levels = mouthLevels(fmt, pcm).map((v) => (scene.mouthClosed ? 0 : v)); // mouthClosed: true なら口を閉じたままにする（見比べ用）
         chara.mouth.forEach((_, i) => {
           const e = rangeExpr(levelRanges(levels, i));
           if (e) put(base + 1 + i, e);

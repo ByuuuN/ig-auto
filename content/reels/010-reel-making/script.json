@@ -1,0 +1,113 @@
+{
+  "id": "010-reel-making",
+  "slides": "010-reel-making",
+  "speaker": 3,
+  "speaker_name": "ずんだもん",
+  "speed": 1.2,
+  "bgm": {
+    "file": "_shared/bgm/maou_bgm_cyber36.mp3",
+    "volume": 0.08
+  },
+  "character": {
+    "body": "_shared/zundamon-body.png",
+    "mouth": [
+      "_shared/zundamon-mouth-0.png",
+      "_shared/zundamon-mouth-1.png",
+      "_shared/zundamon-mouth-2.png"
+    ],
+    "eye": [
+      "_shared/zundamon-eye-0.png",
+      "_shared/zundamon-eye-1.png"
+    ],
+    "width": 500,
+    "bob": 10,
+    "x": "20",
+    "enter": "left"
+  },
+  "scenes": [
+    {
+      "kind": "text",
+      "title": "口パクは\nAIが動かしてる\nと思う？",
+      "note": "動かしているのは、声の大きさだけ",
+      "lines": [
+        {
+          "text": "この口パク、AIが絵を\n動かしていると思うのだ？",
+          "yomi": "この口パク、エーアイが絵を、動かしていると思うのだ？"
+        },
+        {
+          "text": "実は**声の大きさ**\nだけで動いているのだ",
+          "yomi": "実は、声の大きさだけで、動いているのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "mouthClosed": true,
+      "title": "口を閉じたまま\nしゃべると…",
+      "note": "口パクなし",
+      "lines": [
+        {
+          "text": "まず、口を**固定**して\nしゃべってみるのだ",
+          "yomi": "まず、口を、固定して、しゃべってみるのだ。"
+        },
+        {
+          "text": "声は出ているのに、\n口は閉じたままなのだ",
+          "yomi": "声は出ているのに、口は閉じたままなのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "同じ声で\n口を動かすと…",
+      "note": "声の大きさで3段階",
+      "lines": [
+        {
+          "text": "これだけで、ちゃんと\nしゃべっている**感じ**になるのだ",
+          "yomi": "これだけで、ちゃんと、しゃべっている感じになるのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 1,
+      "lines": [
+        {
+          "text": "声の大きさを調べて、\n口を**3段階**で切り替えるのだ",
+          "yomi": "声の大きさを調べて、口を、さんだんかいで切り替えるのだ。"
+        },
+        {
+          "text": "小さいと閉じ、中くらいで\n半開き、大きいと開きなのだ",
+          "yomi": "小さいと閉じ、中くらいで半開き、大きいと開きなのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 2,
+      "lines": [
+        {
+          "text": "音声と口の動きが\n**ズレる**ことはあったのだ",
+          "yomi": "音声と口の動きが、ズレることは、あったのだ。"
+        },
+        {
+          "text": "使った道具は、全部\n**無料**なのだ",
+          "yomi": "使った道具は、全部、無料なのだ。"
+        }
+      ]
+    },
+    {
+      "kind": "slide",
+      "slide": 3,
+      "lines": [
+        {
+          "text": "字幕がインスタの表示に\n**隠れる**位置にあったのだ",
+          "yomi": "字幕が、インスタの表示に、隠れる位置にあったのだ。"
+        },
+        {
+          "text": "Claude Codeと相談中に\n気づいて、公開前に直したのだ",
+          "yomi": "クロードコードと相談中に気づいて、公開前に直したのだ。"
+        }
+      ]
+    }
+  ]
+}
